@@ -50,8 +50,7 @@ public abstract class LdcTransformUnit implements TransformUnit {
 					@Override
 					public void visitInvokeDynamicInsn(String name, String descriptor, Handle bootstrapMethodHandle, Object... bootstrapMethodArguments) {
 						for (int i = 0; i < bootstrapMethodArguments.length; i++) {
-							if (bootstrapMethodArguments[i] instanceof String) {
-								String constant = (String) bootstrapMethodArguments[i];
+							if (bootstrapMethodArguments[i] instanceof String constant) {
 								Optional<String> transformed = transformLdc(constant);
 								if (transformed.isPresent() && !transformed.get().equals(constant)) {
 									ctx.markModified();

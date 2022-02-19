@@ -81,9 +81,7 @@ public class QueryUUIDsFilter implements URLFilter {
 		}
 		if (!mojangNames.isEmpty()) {
 			mojangClient.queryUUIDs(mojangNames)
-					.forEach((name, uuid) -> {
-						result.put(name + NAME_SUFFIX, maskUUID(uuid));
-					});
+					.forEach((name, uuid) -> result.put(name + NAME_SUFFIX, maskUUID(uuid)));
 		}
 		return result;
 	}

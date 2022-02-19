@@ -47,7 +47,7 @@ public final class ProxyParameterWorkaround {
 			if (proxyDetected) {
 				log(WARNING, "--proxyHost parameter conflicts with authlib-injector, therefore proxy is disabled.");
 			}
-			return filtered.toArray(new String[filtered.size()]);
+			return filtered.toArray(new String[0]);
 		});
 	}
 }

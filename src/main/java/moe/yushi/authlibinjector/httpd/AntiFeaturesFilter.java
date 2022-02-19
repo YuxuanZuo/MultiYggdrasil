@@ -18,7 +18,6 @@ package moe.yushi.authlibinjector.httpd;
 
 import static moe.yushi.authlibinjector.util.IOUtils.CONTENT_TYPE_JSON;
 import static moe.yushi.authlibinjector.util.IOUtils.CONTENT_TYPE_TEXT;
-import java.io.IOException;
 import java.util.Optional;
 import moe.yushi.authlibinjector.internal.fi.iki.elonen.IHTTPSession;
 import moe.yushi.authlibinjector.internal.fi.iki.elonen.Response;
@@ -39,7 +38,7 @@ public class AntiFeaturesFilter implements URLFilter {
 	}
 
 	@Override
-	public Optional<Response> handle(String domain, String path, IHTTPSession session) throws IOException {
+	public Optional<Response> handle(String domain, String path, IHTTPSession session) {
 		if (domain.equals("api.minecraftservices.com") && path.equals("/privileges") && session.getMethod().equals("GET")) {
 			return Optional.of(Response.newFixedLength(Status.OK, CONTENT_TYPE_JSON, RESPONSE_PRIVILEGES));
 		} else if (domain.equals("api.minecraftservices.com") && path.equals("/player/attributes") && session.getMethod().equals("GET")) {

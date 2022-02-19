@@ -24,7 +24,6 @@ import static moe.yushi.authlibinjector.util.Logging.Level.WARNING;
 import static org.objectweb.asm.Opcodes.ACC_INTERFACE;
 import static org.objectweb.asm.Opcodes.H_INVOKESTATIC;
 import java.lang.instrument.ClassFileTransformer;
-import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -165,7 +164,7 @@ public class ClassTransformer implements ClassFileTransformer {
 	}
 
 	@Override
-	public byte[] transform(ClassLoader loader, String internalClassName, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+	public byte[] transform(ClassLoader loader, String internalClassName, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
 		if (internalClassName != null && classfileBuffer != null) {
 			try {
 				String className = internalClassName.replace('/', '.');
@@ -181,7 +180,7 @@ public class ClassTransformer implements ClassFileTransformer {
 				listeners.forEach(it -> it.onClassLoading(loader, className, handle.getFinalResult(), handle.getAppliedTransformers()));
 
 				Optional<byte[]> transformResult = handle.finish();
-				if (Config.printUntransformedClass && !transformResult.isPresent()) {
+				if (Config.printUntransformedClass && transformResult.isEmpty()) {
 					log(DEBUG, "No transformation is applied to [" + className + "]");
 				}
 				return transformResult.orElse(null);

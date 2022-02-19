@@ -62,7 +62,7 @@ public final class Logging {
 	}
 
 	public static enum Level {
-		DEBUG, INFO, WARNING, ERROR;
+		DEBUG, INFO, WARNING, ERROR
 	}
 
 	public static void log(Level level, String message) {

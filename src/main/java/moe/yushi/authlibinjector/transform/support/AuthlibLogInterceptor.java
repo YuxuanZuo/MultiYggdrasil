@@ -43,7 +43,7 @@ import moe.yushi.authlibinjector.transform.TransformUnit;
 
 public class AuthlibLogInterceptor implements TransformUnit {
 
-	private static Set<ClassLoader> interceptedClassloaders = Collections.newSetFromMap(new WeakHashMap<>());
+	private static final Set<ClassLoader> interceptedClassloaders = Collections.newSetFromMap(new WeakHashMap<>());
 
 	@CallbackMethod
 	public static void onClassLoading(ClassLoader classLoader) {

@@ -76,22 +76,17 @@ public final class Config {
 		} else {
 			for (String option : prop.split(",")) {
 				switch (option) {
-					case "verbose":
-						verboseLogging = true;
-						break;
-					case "authlib":
-						authlibLogging = true;
-						break;
-					case "printUntransformed":
+					case "verbose" -> verboseLogging = true;
+					case "authlib" -> authlibLogging = true;
+					case "printUntransformed" -> {
 						printUntransformedClass = true;
 						verboseLogging = true;
-						break;
-					case "dumpClass":
-						dumpClass = true;
-						break;
-					default:
+					}
+					case "dumpClass" -> dumpClass = true;
+					default -> {
 						log(ERROR, "Unrecognized debug option: " + option);
 						throw new InitializationException();
+					}
 				}
 			}
 		}
@@ -137,8 +132,7 @@ public final class Config {
 
 	private static void initIgnoredPackages() {
 		Set<String> pkgs = new HashSet<>();
-		for (String pkg : DEFAULT_IGNORED_PACKAGES)
-			pkgs.add(pkg);
+		Collections.addAll(pkgs, DEFAULT_IGNORED_PACKAGES);
 		String propIgnoredPkgs = System.getProperty("authlibinjector.ignoredPackages");
 		if (propIgnoredPkgs != null) {
 			for (String pkg : propIgnoredPkgs.split(",")) {
@@ -172,13 +166,11 @@ public final class Config {
 		int port = Integer.parseInt(matcher.group("port"));
 
 		switch (protocol) {
-			case "socks":
-				mojangProxy = new Proxy(Type.SOCKS, new InetSocketAddress(host, port));
-				break;
-
-			default:
+			case "socks" -> mojangProxy = new Proxy(Type.SOCKS, new InetSocketAddress(host, port));
+			default -> {
 				log(ERROR, "Unsupported proxy protocol: " + protocol);
 				throw new InitializationException();
+			}
 		}
 		log(INFO, "Mojang proxy: " + mojangProxy);
 	}

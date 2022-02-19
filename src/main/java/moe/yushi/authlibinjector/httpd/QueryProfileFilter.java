@@ -19,7 +19,6 @@ package moe.yushi.authlibinjector.httpd;
 import static java.util.Optional.empty;
 import static moe.yushi.authlibinjector.util.UUIDUtils.fromUnsignedUUID;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -51,7 +50,7 @@ public class QueryProfileFilter implements URLFilter {
 	}
 
 	@Override
-	public Optional<Response> handle(String domain, String path, IHTTPSession session) throws IOException {
+	public Optional<Response> handle(String domain, String path, IHTTPSession session) {
 		if (!domain.equals("sessionserver.mojang.com"))
 			return empty();
 		Matcher matcher = PATH_REGEX.matcher(path);

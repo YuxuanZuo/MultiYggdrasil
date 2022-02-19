@@ -16,7 +16,6 @@
  */
 package moe.yushi.authlibinjector.transform.support;
 
-import static java.util.stream.Collectors.joining;
 import static moe.yushi.authlibinjector.util.Logging.log;
 import static moe.yushi.authlibinjector.util.Logging.Level.DEBUG;
 import static org.objectweb.asm.Opcodes.ALOAD;
@@ -27,7 +26,6 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import moe.yushi.authlibinjector.transform.CallbackMethod;
@@ -75,13 +73,13 @@ public class MainArgumentsTransformer implements TransformUnit {
 
 	@CallbackMethod
 	public static String[] processMainArguments(String[] args) {
-		log(DEBUG, "Original main arguments: " + Stream.of(args).collect(joining(" ")));
+		log(DEBUG, "Original main arguments: " + String.join(" ", args));
 
 		String[] result = args;
 		for (Function<String[], String[]> listener : ARGUMENTS_LISTENERS) {
 			result = listener.apply(result);
 		}
-		log(DEBUG, "Transformed main arguments: " + Stream.of(result).collect(joining(" ")));
+		log(DEBUG, "Transformed main arguments: " + String.join(" ", result));
 		return result;
 	}
 
