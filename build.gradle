@@ -9,6 +9,7 @@ repositories {
 }
 
 dependencies {
+	implementation 'com.google.code.gson:gson:2.9.0'
 	implementation 'org.ow2.asm:asm:9.2'
 	testImplementation 'junit:junit:4.13.2'
 }
@@ -52,6 +53,7 @@ shadowJar {
 	exclude 'META-INF/maven/**'
 	exclude 'module-info.class'
 
+	relocate 'com.google.gson', 'moe.yushi.authlibinjector.internal.com.google.gson'
 	relocate 'org.objectweb.asm', 'moe.yushi.authlibinjector.internal.org.objectweb.asm'
 }
 

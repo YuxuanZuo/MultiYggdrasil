@@ -24,27 +24,28 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static moe.yushi.authlibinjector.util.JsonUtils.asJsonArray;
-import static moe.yushi.authlibinjector.util.JsonUtils.asJsonObject;
 import static moe.yushi.authlibinjector.util.JsonUtils.parseJson;
+import static moe.yushi.authlibinjector.util.JsonUtils.toJavaList;
+import static moe.yushi.authlibinjector.util.JsonUtils.toJavaMap;
 import java.io.UncheckedIOException;
 import java.security.PublicKey;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
-import moe.yushi.authlibinjector.internal.org.json.simple.JSONObject;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import moe.yushi.authlibinjector.util.JsonUtils;
 import moe.yushi.authlibinjector.util.KeyUtils;
 
 public class APIMetadata {
 
 	public static APIMetadata parse(String apiRoot, String metadataResponse) throws UncheckedIOException {
-		JSONObject response = asJsonObject(parseJson(metadataResponse));
+		JsonObject response = parseJson(metadataResponse).getAsJsonObject();
 
 		List<String> skinDomains =
 				ofNullable(response.get("skinDomains"))
-						.map(it -> asJsonArray(it).stream()
+						.map(it -> toJavaList(it.getAsJsonArray()).stream()
 								.map(JsonUtils::asJsonString)
 								.collect(toList()))
 						.orElse(emptyList());
@@ -54,9 +55,9 @@ public class APIMetadata {
 						.map(JsonUtils::asJsonString)
 						.map(KeyUtils::parseSignaturePublicKey);
 
-		Map<String, Object> meta =
+		Map<String, JsonElement> meta =
 				ofNullable(response.get("meta"))
-						.map(it -> (Map<String, Object>) new TreeMap<>(asJsonObject(it)))
+						.map(it -> (Map<String, JsonElement>) new TreeMap<>(toJavaMap(it.getAsJsonObject())))
 						.orElse(emptyMap());
 
 		return new APIMetadata(apiRoot, unmodifiableList(skinDomains), unmodifiableMap(meta), decodedPublickey);
@@ -65,9 +66,9 @@ public class APIMetadata {
 	private String apiRoot;
 	private List<String> skinDomains;
 	private Optional<PublicKey> decodedPublickey;
-	private Map<String, Object> meta;
+	private Map<String, JsonElement> meta;
 
-	public APIMetadata(String apiRoot, List<String> skinDomains, Map<String, Object> meta, Optional<PublicKey> decodedPublickey) {
+	public APIMetadata(String apiRoot, List<String> skinDomains, Map<String, JsonElement> meta, Optional<PublicKey> decodedPublickey) {
 		this.apiRoot = requireNonNull(apiRoot);
 		this.skinDomains = requireNonNull(skinDomains);
 		this.meta = requireNonNull(meta);
@@ -82,7 +83,7 @@ public class APIMetadata {
 		return skinDomains;
 	}
 
-	public Map<String, Object> getMeta() {
+	public Map<String, JsonElement> getMeta() {
 		return meta;
 	}
 

@@ -23,7 +23,6 @@ import static java.util.Optional.ofNullable;
 import static moe.yushi.authlibinjector.util.IOUtils.asString;
 import static moe.yushi.authlibinjector.util.IOUtils.http;
 import static moe.yushi.authlibinjector.util.IOUtils.newUncheckedIOException;
-import static moe.yushi.authlibinjector.util.JsonUtils.asJsonObject;
 import static moe.yushi.authlibinjector.util.JsonUtils.parseJson;
 import static moe.yushi.authlibinjector.util.Logging.log;
 import static moe.yushi.authlibinjector.util.Logging.Level.DEBUG;
@@ -35,10 +34,11 @@ import java.util.Base64;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import moe.yushi.authlibinjector.internal.fi.iki.elonen.IHTTPSession;
 import moe.yushi.authlibinjector.internal.fi.iki.elonen.Response;
 import moe.yushi.authlibinjector.internal.fi.iki.elonen.Status;
-import moe.yushi.authlibinjector.internal.org.json.simple.JSONObject;
 import moe.yushi.authlibinjector.util.JsonUtils;
 import moe.yushi.authlibinjector.yggdrasil.YggdrasilClient;
 
@@ -100,11 +100,11 @@ public class LegacySkinAPIFilter implements URLFilter {
 	}
 
 	private Optional<String> obtainTextureUrl(String texturesPayload, String textureType) throws UncheckedIOException {
-		JSONObject payload = asJsonObject(parseJson(texturesPayload));
-		JSONObject textures = asJsonObject(payload.get("textures"));
+		JsonObject payload = parseJson(texturesPayload).getAsJsonObject();
+		JsonObject textures = payload.get("textures").getAsJsonObject();
 
 		return ofNullable(textures.get(textureType))
-				.map(JsonUtils::asJsonObject)
+				.map(JsonElement::getAsJsonObject)
 				.map(it -> ofNullable(it.get("url"))
 						.map(JsonUtils::asJsonString)
 						.orElseThrow(() -> newUncheckedIOException("Invalid JSON: Missing texture url")));

@@ -19,7 +19,6 @@ package moe.yushi.authlibinjector.httpd;
 import static moe.yushi.authlibinjector.util.IOUtils.CONTENT_TYPE_JSON;
 import static moe.yushi.authlibinjector.util.IOUtils.asBytes;
 import static moe.yushi.authlibinjector.util.IOUtils.asString;
-import static moe.yushi.authlibinjector.util.JsonUtils.asJsonArray;
 import static moe.yushi.authlibinjector.util.JsonUtils.asJsonString;
 import static moe.yushi.authlibinjector.util.JsonUtils.parseJson;
 import static moe.yushi.authlibinjector.util.Logging.log;
@@ -56,7 +55,7 @@ public class QueryUUIDsFilter implements URLFilter {
 	public Optional<Response> handle(String domain, String path, IHTTPSession session) throws IOException {
 		if (domain.equals("api.mojang.com") && path.equals("/profiles/minecraft") && session.getMethod().equals("POST")) {
 			Set<String> request = new LinkedHashSet<>();
-			asJsonArray(parseJson(asString(asBytes(session.getInputStream()))))
+			parseJson(asString(asBytes(session.getInputStream()))).getAsJsonArray()
 					.forEach(element -> request.add(asJsonString(element)));
 			return Optional.of(Response.newFixedLength(Status.OK, CONTENT_TYPE_JSON,
 					YggdrasilResponseBuilder.queryUUIDs(performQuery(request))));

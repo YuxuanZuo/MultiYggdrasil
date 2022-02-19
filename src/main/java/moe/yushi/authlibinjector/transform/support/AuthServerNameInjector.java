@@ -16,7 +16,9 @@
  */
 package moe.yushi.authlibinjector.transform.support;
 
+import static moe.yushi.authlibinjector.util.JsonUtils.asJsonString;
 import static moe.yushi.authlibinjector.util.Logging.log;
+import com.google.gson.JsonElement;
 import moe.yushi.authlibinjector.APIMetadata;
 import moe.yushi.authlibinjector.util.Logging.Level;
 
@@ -24,9 +26,9 @@ public final class AuthServerNameInjector {
 	private AuthServerNameInjector() {}
 
 	private static String getServerName(APIMetadata meta) {
-		Object serverName = meta.getMeta().get("serverName");
-		if (serverName instanceof String) {
-			return (String) serverName;
+		JsonElement serverName = meta.getMeta().get("serverName");
+		if (serverName.getAsJsonPrimitive().isString()) {
+			return asJsonString(serverName);
 		} else {
 			return meta.getApiRoot();
 		}

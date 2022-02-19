@@ -19,6 +19,7 @@ package moe.yushi.authlibinjector;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 import static moe.yushi.authlibinjector.util.IOUtils.asBytes;
 import static moe.yushi.authlibinjector.util.IOUtils.asString;
 import static moe.yushi.authlibinjector.util.IOUtils.removeNewLines;
@@ -112,7 +113,7 @@ public final class AuthlibInjector {
 				log(WARNING, "'-Dorg.to2mbn.authlibinjector.config.prefetched=' is deprecated, use '-Dauthlibinjector.yggdrasil.prefetched=' instead");
 			}
 		}
-		return Optional.ofNullable(prefetched);
+		return ofNullable(prefetched);
 	}
 
 	private static APIMetadata fetchAPIMetadata(String apiUrl) {
@@ -228,14 +229,18 @@ public final class AuthlibInjector {
 		YggdrasilClient customClient = new YggdrasilClient(new CustomYggdrasilAPIProvider(config));
 		YggdrasilClient mojangClient = new YggdrasilClient(new MojangYggdrasilAPIProvider(), Config.mojangProxy);
 
-		boolean legacySkinPolyfillDefault = !Boolean.TRUE.equals(config.getMeta().get("feature.legacy_skin_api"));
+		boolean legacySkinPolyfillDefault = !Boolean.TRUE.equals(ofNullable(config.getMeta().get("feature.legacy_skin_api"))
+				.map(element -> element.getAsJsonPrimitive().getAsBoolean())
+				.orElse(Boolean.FALSE));
 		if (Config.legacySkinPolyfill.isEnabled(legacySkinPolyfillDefault)) {
 			filters.add(new LegacySkinAPIFilter(customClient));
 		} else {
 			log(INFO, "Disabled legacy skin API polyfill");
 		}
 
-		boolean mojangNamespaceDefault = !Boolean.TRUE.equals(config.getMeta().get("feature.no_mojang_namespace"));
+		boolean mojangNamespaceDefault = !Boolean.TRUE.equals(ofNullable(config.getMeta().get("feature.no_mojang_namespace"))
+				.map(element -> element.getAsJsonPrimitive().getAsBoolean())
+				.orElse(Boolean.FALSE));
 		if (Config.mojangNamespace.isEnabled(mojangNamespaceDefault)) {
 			filters.add(new QueryUUIDsFilter(mojangClient, customClient));
 			filters.add(new QueryProfileFilter(mojangClient, customClient));
@@ -243,7 +248,9 @@ public final class AuthlibInjector {
 			log(INFO, "Disabled Mojang namespace");
 		}
 
-		boolean mojangAntiFeaturesDefault = Boolean.TRUE.equals(config.getMeta().get("feature.enable_mojang_anti_features"));
+		boolean mojangAntiFeaturesDefault = Boolean.TRUE.equals(ofNullable(config.getMeta().get("feature.enable_mojang_anti_features"))
+				.map(element -> element.getAsJsonPrimitive().getAsBoolean())
+				.orElse(Boolean.FALSE));
 		if (!Config.mojangAntiFeatures.isEnabled(mojangAntiFeaturesDefault)) {
 			filters.add(new AntiFeaturesFilter());
 		}

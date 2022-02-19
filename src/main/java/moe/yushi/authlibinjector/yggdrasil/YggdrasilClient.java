@@ -22,8 +22,6 @@ import static moe.yushi.authlibinjector.util.IOUtils.CONTENT_TYPE_JSON;
 import static moe.yushi.authlibinjector.util.IOUtils.asString;
 import static moe.yushi.authlibinjector.util.IOUtils.http;
 import static moe.yushi.authlibinjector.util.IOUtils.newUncheckedIOException;
-import static moe.yushi.authlibinjector.util.JsonUtils.asJsonArray;
-import static moe.yushi.authlibinjector.util.JsonUtils.asJsonObject;
 import static moe.yushi.authlibinjector.util.JsonUtils.asJsonString;
 import static moe.yushi.authlibinjector.util.JsonUtils.parseJson;
 import static moe.yushi.authlibinjector.util.Logging.log;
@@ -37,8 +35,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import moe.yushi.authlibinjector.internal.org.json.simple.JSONArray;
-import moe.yushi.authlibinjector.internal.org.json.simple.JSONObject;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import moe.yushi.authlibinjector.util.JsonUtils;
 import moe.yushi.authlibinjector.yggdrasil.GameProfile.PropertyValue;
 
 public class YggdrasilClient {
@@ -59,7 +58,7 @@ public class YggdrasilClient {
 		String responseText;
 		try {
 			responseText = asString(http("POST", apiProvider.queryUUIDsByNames(),
-					JSONArray.toJSONString(names).getBytes(UTF_8), CONTENT_TYPE_JSON,
+					JsonUtils.toJsonString(names).getBytes(UTF_8), CONTENT_TYPE_JSON,
 					proxy));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -67,8 +66,8 @@ public class YggdrasilClient {
 		log(DEBUG, "Query UUIDs of " + names + " at [" + apiProvider + "], response: " + responseText);
 
 		Map<String, UUID> result = new LinkedHashMap<>();
-		for (Object rawProfile : asJsonArray(parseJson(responseText))) {
-			JSONObject profile = asJsonObject(rawProfile);
+		for (JsonElement rawProfile : parseJson(responseText).getAsJsonArray()) {
+			JsonObject profile = rawProfile.getAsJsonObject();
 			result.put(
 					asJsonString(profile.get("name")),
 					parseUnsignedUUID(asJsonString(profile.get("id"))));
@@ -97,19 +96,19 @@ public class YggdrasilClient {
 		}
 		log(DEBUG, "Query profile of [" + uuid + "] at [" + apiProvider + "], response: " + responseText);
 
-		return Optional.of(parseGameProfile(asJsonObject(parseJson(responseText))));
+		return Optional.of(parseGameProfile(parseJson(responseText).getAsJsonObject()));
 	}
 
-	private GameProfile parseGameProfile(JSONObject json) {
+	private GameProfile parseGameProfile(JsonObject json) {
 		GameProfile profile = new GameProfile();
 		profile.id = parseUnsignedUUID(asJsonString(json.get("id")));
 		profile.name = asJsonString(json.get("name"));
 		profile.properties = new LinkedHashMap<>();
-		for (Object rawProperty : asJsonArray(json.get("properties"))) {
-			JSONObject property = (JSONObject) rawProperty;
+		for (JsonElement rawProperty : json.get("properties").getAsJsonArray()) {
+			JsonObject property = rawProperty.getAsJsonObject();
 			PropertyValue entry = new PropertyValue();
 			entry.value = asJsonString(property.get("value"));
-			if (property.containsKey("signature")) {
+			if (property.has("signature")) {
 				entry.signature = asJsonString(property.get("signature"));
 			}
 			profile.properties.put(asJsonString(property.get("name")), entry);
