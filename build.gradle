@@ -1,6 +1,6 @@
 plugins {
-	id 'com.github.johnrengelman.shadow' version '7.0.0'
-	id 'com.palantir.git-version' version '0.12.3'
+	id 'com.github.johnrengelman.shadow' version '7.1.2'
+	id 'com.palantir.git-version' version '0.13.0'
 	id 'java'
 }
 
@@ -14,7 +14,7 @@ dependencies {
 	testImplementation 'junit:junit:4.13.2'
 }
 
-sourceCompatibility = 8
+sourceCompatibility = 17
 
 def buildNumber = System.getenv('AI_BUILD_NUMBER')
 def gitInfo = versionDetails()
