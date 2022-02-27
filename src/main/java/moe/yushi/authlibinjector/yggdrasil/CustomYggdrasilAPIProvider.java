@@ -39,6 +39,15 @@ public class CustomYggdrasilAPIProvider implements YggdrasilAPIProvider {
 	}
 
 	@Override
+	public String hasJoinedServer(String username, String serverId, String ip) {
+		if (ip == null) {
+			return apiRoot + "sessionserver/session/minecraft/hasJoined?username=" + username + "&serverId=" + serverId;
+		} else {
+			return apiRoot + "sessionserver/session/minecraft/hasJoined?username=" + username + "&serverId=" + serverId + "&ip=" + ip;
+		}
+	}
+
+	@Override
 	public String toString() {
 		return apiRoot;
 	}

@@ -33,6 +33,15 @@ public class MojangYggdrasilAPIProvider implements YggdrasilAPIProvider {
 	}
 
 	@Override
+	public String hasJoinedServer(String username, String serverId, String ip) {
+		if (ip == null) {
+			return "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=" + username + "&serverId=" + serverId;
+		} else {
+			return "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=" + username + "&serverId=" + serverId + "&ip=" + ip;
+		}
+	}
+
+	@Override
 	public String toString() {
 		return "Mojang";
 	}

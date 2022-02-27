@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020  Haowei Wen <yushijinhun@gmail.com> and contributors
+ * Copyright (C) 2022  Ethan Zuo <yuxuan.zuo@outlook.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,6 +20,7 @@ import static java.util.Optional.empty;
 import static moe.yushi.authlibinjector.util.IOUtils.CONTENT_TYPE_JSON;
 import static moe.yushi.authlibinjector.util.UUIDUtils.fromUnsignedUUID;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,14 +34,14 @@ import moe.yushi.authlibinjector.yggdrasil.GameProfile;
 import moe.yushi.authlibinjector.yggdrasil.YggdrasilClient;
 import moe.yushi.authlibinjector.yggdrasil.YggdrasilResponseBuilder;
 
-public class QueryProfileFilter implements URLFilter {
+public class MultiQueryProfileFilter implements URLFilter {
 
 	private static final Pattern PATH_REGEX = Pattern.compile("^/session/minecraft/profile/(?<uuid>[0-9a-f]{32})$");
 
 	private YggdrasilClient mojangClient;
 	private YggdrasilClient customClient;
 
-	public QueryProfileFilter(YggdrasilClient mojangClient, YggdrasilClient customClient) {
+	public MultiQueryProfileFilter(YggdrasilClient mojangClient, YggdrasilClient customClient) {
 		this.mojangClient = mojangClient;
 		this.customClient = customClient;
 	}
@@ -51,7 +52,7 @@ public class QueryProfileFilter implements URLFilter {
 	}
 
 	@Override
-	public Optional<Response> handle(String domain, String path, IHTTPSession session) {
+	public Optional<Response> handle(String domain, String path, IHTTPSession session) throws IOException {
 		if (!domain.equals("sessionserver.mojang.com"))
 			return empty();
 		Matcher matcher = PATH_REGEX.matcher(path);
@@ -72,13 +73,8 @@ public class QueryProfileFilter implements URLFilter {
 		}
 
 		Optional<GameProfile> response;
-		if (QueryUUIDsFilter.isMaskedUUID(uuid)) {
-			response = mojangClient.queryProfile(QueryUUIDsFilter.unmaskUUID(uuid), withSignature);
-			response.ifPresent(profile -> {
-				profile.id = uuid;
-				profile.name += QueryUUIDsFilter.NAME_SUFFIX;
-			});
-		} else {
+		response = mojangClient.queryProfile(uuid, withSignature);
+		if (response.isEmpty()) {
 			response = customClient.queryProfile(uuid, withSignature);
 		}
 

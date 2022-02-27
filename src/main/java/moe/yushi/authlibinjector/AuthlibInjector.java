@@ -46,6 +46,8 @@ import java.util.stream.Stream;
 import moe.yushi.authlibinjector.httpd.DefaultURLRedirector;
 import moe.yushi.authlibinjector.httpd.LegacySkinAPIFilter;
 import moe.yushi.authlibinjector.httpd.AntiFeaturesFilter;
+import moe.yushi.authlibinjector.httpd.MultiHasJoinedServerFilter;
+import moe.yushi.authlibinjector.httpd.MultiQueryProfileFilter;
 import moe.yushi.authlibinjector.httpd.QueryProfileFilter;
 import moe.yushi.authlibinjector.httpd.QueryUUIDsFilter;
 import moe.yushi.authlibinjector.httpd.URLFilter;
@@ -233,10 +235,19 @@ public final class AuthlibInjector {
 			log(INFO, "Disabled legacy skin API polyfill");
 		}
 
+		if (Config.enableMojangYggdrasilServer) {
+			log(INFO, "Mojang Yggdrasil server is enabled, Mojang namespace will be disabled!");
+			filters.add(new MultiHasJoinedServerFilter(mojangClient, customClient));
+			filters.add(new QueryUUIDsFilter(mojangClient, customClient));
+			filters.add(new MultiQueryProfileFilter(mojangClient, customClient));
+		} else {
+			log(INFO, "Disabled Mojang Yggdrasil server");
+		}
+
 		boolean mojangNamespaceDefault = !Boolean.TRUE.equals(ofNullable(config.getMeta().get("feature.no_mojang_namespace"))
 				.map(element -> element.getAsJsonPrimitive().getAsBoolean())
 				.orElse(Boolean.FALSE));
-		if (Config.mojangNamespace.isEnabled(mojangNamespaceDefault)) {
+		if (Config.mojangNamespace.isEnabled(mojangNamespaceDefault) && !Config.enableMojangYggdrasilServer) {
 			filters.add(new QueryUUIDsFilter(mojangClient, customClient));
 			filters.add(new QueryProfileFilter(mojangClient, customClient));
 		} else {

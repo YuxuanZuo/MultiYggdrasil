@@ -55,6 +55,7 @@ public final class Config {
 	public static boolean printUntransformedClass;
 	public static boolean dumpClass;
 	public static boolean httpdDisabled;
+	public static boolean enableMojangYggdrasilServer;
 	public static /* nullable */ Proxy mojangProxy;
 	public static Set<String> ignoredPackages;
 	public static FeatureOption mojangNamespace;
@@ -197,6 +198,7 @@ public final class Config {
 		legacySkinPolyfill = parseFeatureOption("authlibinjector.legacySkinPolyfill");
 		mojangAntiFeatures = parseFeatureOption("authlibinjector.mojangAntiFeatures");
 		httpdDisabled = System.getProperty("authlibinjector.disableHttpd") != null;
+		enableMojangYggdrasilServer = System.getProperty("authlibinjector.enableMojangYggdrasilServer") != null;
 		noShowServerName = System.getProperty("authlibinjector.noShowServerName") != null;
 	}
 }

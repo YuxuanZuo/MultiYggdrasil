@@ -99,6 +99,22 @@ public class YggdrasilClient {
 		return Optional.of(parseGameProfile(parseJson(responseText).getAsJsonObject()));
 	}
 
+	public Optional<GameProfile> hasJoinedServer(String username, String serverId, String ip) {
+		String responseText;
+		try {
+			responseText = asString(http("GET", apiProvider.hasJoinedServer(username, serverId, ip) , proxy));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		if (responseText.isEmpty()) {
+			log(DEBUG, "Username [" + username + "] is not authenticated at [" + apiProvider + "] Yggdrasil server");
+			return Optional.empty();
+		}
+		log(DEBUG, "Username [" + username + "] has been authenticated at [" + apiProvider + "] Yggdrasil server, response: " + responseText);
+
+		return Optional.of(parseGameProfile(parseJson(responseText).getAsJsonObject()));
+	}
+
 	private GameProfile parseGameProfile(JsonObject json) {
 		GameProfile profile = new GameProfile();
 		profile.id = parseUnsignedUUID(asJsonString(json.get("id")));

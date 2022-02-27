@@ -59,4 +59,24 @@ public final class YggdrasilResponseBuilder {
 
 		return toJsonString(response);
 	}
+
+	public static String hasJoinedServer(GameProfile profile) {
+		JsonObject response = new JsonObject();
+		response.addProperty("id", toUnsignedUUID(profile.id));
+		response.addProperty("name", profile.name);
+
+		JsonArray properties = new JsonArray();
+		profile.properties.forEach((name, value) -> {
+			JsonObject entry = new JsonObject();
+			entry.addProperty("name", name);
+			entry.addProperty("value", value.value);
+			if (value.signature != null) {
+				entry.addProperty("signature", value.signature);
+			}
+			properties.add(entry);
+		});
+		response.add("properties", properties);
+
+		return toJsonString(response);
+	}
 }
