@@ -17,11 +17,11 @@
 package moe.yushi.authlibinjector.test;
 
 import static moe.yushi.authlibinjector.transform.support.MainArgumentsTransformer.inferVersionSeries;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class VersionSeriesDetectTest {
 

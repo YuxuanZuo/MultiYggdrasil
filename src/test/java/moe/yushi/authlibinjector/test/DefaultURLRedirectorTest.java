@@ -18,9 +18,9 @@ package moe.yushi.authlibinjector.test;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Optional;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import moe.yushi.authlibinjector.APIMetadata;
 import moe.yushi.authlibinjector.httpd.DefaultURLRedirector;
 
