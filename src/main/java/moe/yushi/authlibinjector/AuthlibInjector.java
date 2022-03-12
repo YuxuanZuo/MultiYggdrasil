@@ -56,10 +56,7 @@ import moe.yushi.authlibinjector.transform.support.AuthServerNameInjector;
 import moe.yushi.authlibinjector.transform.support.AuthlibLogInterceptor;
 import moe.yushi.authlibinjector.transform.support.BungeeCordAllowedCharactersTransformer;
 import moe.yushi.authlibinjector.transform.support.CitizensTransformer;
-import moe.yushi.authlibinjector.transform.support.ConcatenateURLTransformUnit;
 import moe.yushi.authlibinjector.transform.support.ConstantURLTransformUnit;
-import moe.yushi.authlibinjector.transform.support.MC52974Workaround;
-import moe.yushi.authlibinjector.transform.support.MC52974_1710Workaround;
 import moe.yushi.authlibinjector.transform.support.MainArgumentsTransformer;
 import moe.yushi.authlibinjector.transform.support.ProxyParameterWorkaround;
 import moe.yushi.authlibinjector.transform.support.SkinWhitelistTransformUnit;
@@ -98,8 +95,6 @@ public final class AuthlibInjector {
 		instrumentation.addTransformer(classTransformer, retransformSupported);
 
 		ProxyParameterWorkaround.init();
-		MC52974Workaround.init();
-		MC52974_1710Workaround.init();
 		if (!Config.noShowServerName) {
 			AuthServerNameInjector.init(apiMetadata);
 		}
@@ -275,7 +270,6 @@ public final class AuthlibInjector {
 		transformer.units.add(new MainArgumentsTransformer());
 		transformer.units.add(new ConstantURLTransformUnit(urlProcessor));
 		transformer.units.add(new CitizensTransformer());
-		transformer.units.add(new ConcatenateURLTransformUnit());
 		transformer.units.add(new BungeeCordAllowedCharactersTransformer());
 		transformer.units.add(new UsernameCharacterCheckTransformer());
 
