@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2022  Haowei Wen <yushijinhun@gmail.com> and contributors
+ * Copyright (C) 2022  Ethan Zuo <yuxuan.zuo@outlook.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -55,10 +56,10 @@ public final class Config {
 	public static boolean printUntransformedClass;
 	public static boolean dumpClass;
 	public static boolean httpdDisabled;
-	public static boolean enableMojangYggdrasilServer;
 	public static /* nullable */ Proxy mojangProxy;
 	public static Set<String> ignoredPackages;
 	public static FeatureOption mojangNamespace;
+	public static FeatureOption mojangYggdrasilService;
 	public static FeatureOption legacySkinPolyfill;
 	public static FeatureOption mojangAntiFeatures;
 	public static boolean noShowServerName;
@@ -195,10 +196,10 @@ public final class Config {
 		initMojangProxy();
 
 		mojangNamespace = parseFeatureOption("authlibinjector.mojangNamespace");
+		mojangYggdrasilService = parseFeatureOption("authlibinjector.mojangYggdrasilService");
 		legacySkinPolyfill = parseFeatureOption("authlibinjector.legacySkinPolyfill");
 		mojangAntiFeatures = parseFeatureOption("authlibinjector.mojangAntiFeatures");
 		httpdDisabled = System.getProperty("authlibinjector.disableHttpd") != null;
-		enableMojangYggdrasilServer = System.getProperty("authlibinjector.enableMojangYggdrasilServer") != null;
 		noShowServerName = System.getProperty("authlibinjector.noShowServerName") != null;
 	}
 }

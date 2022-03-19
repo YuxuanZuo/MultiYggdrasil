@@ -61,7 +61,7 @@ gradle
     设置访问 Mojang 验证服务时使用的代理, 目前仅支持 SOCKS 协议.
     URL 格式: socks://<host>:<port>
 
-    这一代理仅作用于 Mojang 命名空间 功能, 其仅用于访问 Mojang 服务器.
+    这一代理仅作用于 Mojang 命名空间 和 Mojang 验证服务器 功能, 其仅用于访问 Mojang 服务器.
     若要在访问自定义验证服务器时使用代理, 请参考 https://docs.oracle.com/javase/8/docs/technotes/guides/net/proxies.html .
 
 -Dauthlibinjector.legacySkinPolyfill={default|enabled|disabled}
@@ -101,6 +101,21 @@ gradle
        * 领域权限 (禁用后默认允许)
        * 遥测 (禁用后默认关闭)
        * 冒犯性内容过滤 (禁用后默认关闭)
+
+-Dauthlibinjector.mojangYggdrasilService={default|enabled|disabled}
+    设置是否与 Mojang 验证服务器共存.
+    若验证服务器未设置 feature.enable_mojang_yggdrasil_service 选项, 则默认禁用.
+
+    若启用此功能, 将同时允许自定义验证服务器角色与正版角色进入服务器, 这要求自定义验证服务器使用版本 3 (MD5哈希) UUID 生成算法为角色生成 UUID
+    以与正版角色区分. 注意, 如果您此前使用其它版本的 UUID 生成算法, 则需要对验证服务器和服务端的角色数据进行迁移, 否则可能产生未知问题.
+
+    为了将自定义验证服务器角色与正版角色的用户名区别开, 前者的用户名将被添加命名空间后缀.
+    例如:
+      Notch@custom
+    若验证服务器未设置 namespace 字段, 将使用默认命名空间 custom, 否则使用验证服务器定义的命名空间.
+
+    以下与 Mojang 验证服务器冲突的功能将不可用:
+     - Mojang 命名空间
 ```
 
 ## 捐助

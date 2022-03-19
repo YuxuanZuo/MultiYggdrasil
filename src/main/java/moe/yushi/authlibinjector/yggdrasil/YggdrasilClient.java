@@ -99,7 +99,7 @@ public class YggdrasilClient {
 		return Optional.of(parseGameProfile(parseJson(responseText).getAsJsonObject()));
 	}
 
-	public Optional<GameProfile> hasJoinedServer(String username, String serverId, String ip) {
+	public Optional<GameProfile> hasJoinedServer(String username, String serverId, String ip) throws UncheckedIOException {
 		String responseText;
 		try {
 			responseText = asString(http("GET", apiProvider.hasJoinedServer(username, serverId, ip) , proxy));

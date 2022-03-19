@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2022  Haowei Wen <yushijinhun@gmail.com> and contributors
+ * Copyright (C) 2022  Ethan Zuo <yuxuan.zuo@outlook.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +29,7 @@ import static moe.yushi.authlibinjector.util.Logging.Level.DEBUG;
 import static moe.yushi.authlibinjector.util.Logging.Level.ERROR;
 import static moe.yushi.authlibinjector.util.Logging.Level.INFO;
 import static moe.yushi.authlibinjector.util.Logging.Level.WARNING;
+import static moe.yushi.authlibinjector.yggdrasil.NamespacedID.UNKNOWN_NAMESPACE;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -48,6 +50,7 @@ import moe.yushi.authlibinjector.httpd.LegacySkinAPIFilter;
 import moe.yushi.authlibinjector.httpd.AntiFeaturesFilter;
 import moe.yushi.authlibinjector.httpd.MultiHasJoinedServerFilter;
 import moe.yushi.authlibinjector.httpd.MultiQueryProfileFilter;
+import moe.yushi.authlibinjector.httpd.MultiQueryUUIDsFilter;
 import moe.yushi.authlibinjector.httpd.QueryProfileFilter;
 import moe.yushi.authlibinjector.httpd.QueryUUIDsFilter;
 import moe.yushi.authlibinjector.httpd.URLFilter;
@@ -64,6 +67,7 @@ import moe.yushi.authlibinjector.transform.support.ProxyParameterWorkaround;
 import moe.yushi.authlibinjector.transform.support.SkinWhitelistTransformUnit;
 import moe.yushi.authlibinjector.transform.support.UsernameCharacterCheckTransformer;
 import moe.yushi.authlibinjector.transform.support.YggdrasilKeyTransformUnit;
+import moe.yushi.authlibinjector.util.JsonUtils;
 import moe.yushi.authlibinjector.yggdrasil.CustomYggdrasilAPIProvider;
 import moe.yushi.authlibinjector.yggdrasil.MojangYggdrasilAPIProvider;
 import moe.yushi.authlibinjector.yggdrasil.YggdrasilClient;
@@ -193,6 +197,13 @@ public final class AuthlibInjector {
 		return metadata;
 	}
 
+	public static String getNamespace(APIMetadata meta) {
+		return ofNullable(meta.getMeta().get("namespace"))
+				.filter(element -> element.getAsJsonPrimitive().isString())
+				.map(JsonUtils::asJsonString)
+				.orElse(UNKNOWN_NAMESPACE);
+	}
+
 	private static void warnIfHttp(String url) {
 		if (url.toLowerCase().startsWith("http://")) {
 			log(WARNING, "You are using HTTP protocol, which is INSECURE! Please switch to HTTPS if possible.");
@@ -235,19 +246,23 @@ public final class AuthlibInjector {
 			log(INFO, "Disabled legacy skin API polyfill");
 		}
 
-		if (Config.enableMojangYggdrasilServer) {
-			log(INFO, "Mojang Yggdrasil server is enabled, Mojang namespace will be disabled!");
-			filters.add(new MultiHasJoinedServerFilter(mojangClient, customClient));
-			filters.add(new QueryUUIDsFilter(mojangClient, customClient));
-			filters.add(new MultiQueryProfileFilter(mojangClient, customClient));
+		boolean mojangYggdrasilServiceDefault = Boolean.TRUE.equals(ofNullable(config.getMeta().get("feature.enable_mojang_yggdrasil_service"))
+				.map(element -> element.getAsJsonPrimitive().getAsBoolean())
+				.orElse(Boolean.FALSE));
+		if (Config.mojangYggdrasilService.isEnabled(mojangYggdrasilServiceDefault)) {
+			log(INFO, "Mojang Yggdrasil service is enabled, Mojang namespace will be disabled!");
+			String namespace = getNamespace(config);
+			filters.add(new MultiHasJoinedServerFilter(mojangClient, customClient, namespace));
+			filters.add(new MultiQueryUUIDsFilter(mojangClient, customClient, namespace));
+			filters.add(new MultiQueryProfileFilter(mojangClient, customClient, namespace));
 		} else {
-			log(INFO, "Disabled Mojang Yggdrasil server");
+			log(INFO, "Disabled Mojang Yggdrasil service");
 		}
 
 		boolean mojangNamespaceDefault = !Boolean.TRUE.equals(ofNullable(config.getMeta().get("feature.no_mojang_namespace"))
 				.map(element -> element.getAsJsonPrimitive().getAsBoolean())
 				.orElse(Boolean.FALSE));
-		if (Config.mojangNamespace.isEnabled(mojangNamespaceDefault) && !Config.enableMojangYggdrasilServer) {
+		if (Config.mojangNamespace.isEnabled(mojangNamespaceDefault) && !Config.mojangYggdrasilService.isEnabled(mojangYggdrasilServiceDefault)) {
 			filters.add(new QueryUUIDsFilter(mojangClient, customClient));
 			filters.add(new QueryProfileFilter(mojangClient, customClient));
 		} else {

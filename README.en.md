@@ -53,7 +53,7 @@ Configure Minecraft server with the following JVM parameter:
     Only SOCKS protocol is supported.
     URL format: socks://<host>:<port>
 
-    This proxy setting only affects Mojang namespace feature, and the proxy is used only when accessing Mojang's servers.
+    This proxy setting only affects Mojang namespace and Mojang Yggdrasil server feature, and the proxy is used only when accessing Mojang's servers.
     To enable proxy for your customized authentication server, see https://docs.oracle.com/javase/8/docs/technotes/guides/net/proxies.html .
 
 -Dauthlibinjector.legacySkinPolyfill={default|enabled|disabled}
@@ -84,7 +84,7 @@ Configure Minecraft server with the following JVM parameter:
 
 -Dauthlibinjector.mojangAntiFeatures={default|enabled|disabled}
     Whether to turn on Minecraft's anti-features.
-    It's enabled by default if the authentication server does NOT send feature.enable_mojang_anti_features option.
+    It's disabled by default if the authentication server does NOT send feature.enable_mojang_anti_features option.
 
     These anti-features include:
      - Minecraft server blocklist
@@ -94,4 +94,24 @@ Configure Minecraft server with the following JVM parameter:
        * Realms (allowed if the option is disabled)
        * Telemetry (turned off if the option is disabled)
        * Profanity filter (turned off if the option is disabled)
+
+-Dauthlibinjector.mojangYggdrasilService={default|enabled|disabled}
+    Whether to enable ability to coexist with the Mojang authentication server.
+    It's disabled by default if the authentication server does NOT send feature.enable_mojang_yggdrasil_service option.
+    
+    If this option is enabled, the game server will allow players from the custom authentication server and genuine
+    players to login simultaneously. This would required the custom authentication server to generate a UUID for the
+    player using the version 3 (MD5 hashing) UUID generator algorithm so that it could distinguish the custom player
+    from the genuine player. Note: If you used a different UUID generator algorithm than version 4 before, you MUST
+    migrate your server data of the player to the new ones, otherwise you may run into some random issues.
+    
+    In order to distinguish the username of players from the custom authentication server from that of the Mojang server,
+    the player who from the custom authentication server will add a namespace suffix to their username.
+    For example:
+      Notch@custom
+    If the field "namespace" is not sent by authentication server, the server will issue a default namespace called
+    "custom". If any fields were sent, the server will use the namespace that you defined earlier.
+    
+    Some features that conflict with Mojang Yggdrasil server will no longer available anymore:
+     - Mojang namespace
 ```

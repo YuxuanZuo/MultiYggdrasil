@@ -17,8 +17,11 @@
 package moe.yushi.authlibinjector.httpd;
 
 import static moe.yushi.authlibinjector.util.IOUtils.CONTENT_TYPE_JSON;
+import static moe.yushi.authlibinjector.util.Logging.Level.ERROR;
+import static moe.yushi.authlibinjector.util.Logging.log;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +30,7 @@ import moe.yushi.authlibinjector.internal.fi.iki.elonen.IHTTPSession;
 import moe.yushi.authlibinjector.internal.fi.iki.elonen.Response;
 import moe.yushi.authlibinjector.internal.fi.iki.elonen.Status;
 import moe.yushi.authlibinjector.yggdrasil.GameProfile;
+import moe.yushi.authlibinjector.yggdrasil.NamespacedID;
 import moe.yushi.authlibinjector.yggdrasil.YggdrasilClient;
 import moe.yushi.authlibinjector.yggdrasil.YggdrasilResponseBuilder;
 
@@ -34,10 +38,12 @@ public class MultiHasJoinedServerFilter implements URLFilter {
 
     private YggdrasilClient mojangClient;
     private YggdrasilClient customClient;
+    private String namespace;
 
-    public MultiHasJoinedServerFilter(YggdrasilClient mojangClient, YggdrasilClient customClient) {
+    public MultiHasJoinedServerFilter(YggdrasilClient mojangClient, YggdrasilClient customClient, String namespace) {
         this.mojangClient = mojangClient;
         this.customClient = customClient;
+        this.namespace = namespace;
     }
 
     @Override
@@ -50,15 +56,19 @@ public class MultiHasJoinedServerFilter implements URLFilter {
         if (domain.equals("sessionserver.mojang.com") && path.equals("/session/minecraft/hasJoined") && session.getMethod().equals("GET")) {
             Map<String, String> params = new LinkedHashMap<>();
             session.getParameters().forEach(
-                    (key ,value) -> {
-                        params.put(key, value.get(0));
-                    }
+                    (key ,value) -> params.put(key, value.get(0))
             );
 
-            Optional<GameProfile> response;
-            response = mojangClient.hasJoinedServer(params.get("username"), params.get("serverId"), params.get("ip"));
+            Optional<GameProfile> response = Optional.empty();
+            try {
+                response = mojangClient.hasJoinedServer(params.get("username"), params.get("serverId"), params.get("ip"));
+            } catch (UncheckedIOException e) {
+                log(ERROR, "An error occurred while verifying username [ " + params.get("username") + " ]:\n" +
+                        e.getCause());
+            }
             if (response.isEmpty()) {
                 response = customClient.hasJoinedServer(params.get("username"), params.get("serverId"), params.get("ip"));
+                response.ifPresent(profile -> profile.name = new NamespacedID(profile.name, namespace).toString());
             }
 
             if (response.isPresent()) {

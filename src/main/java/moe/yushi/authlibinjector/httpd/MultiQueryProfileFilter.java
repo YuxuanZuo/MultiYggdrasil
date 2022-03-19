@@ -31,6 +31,7 @@ import moe.yushi.authlibinjector.internal.fi.iki.elonen.IHTTPSession;
 import moe.yushi.authlibinjector.internal.fi.iki.elonen.Response;
 import moe.yushi.authlibinjector.internal.fi.iki.elonen.Status;
 import moe.yushi.authlibinjector.yggdrasil.GameProfile;
+import moe.yushi.authlibinjector.yggdrasil.NamespacedID;
 import moe.yushi.authlibinjector.yggdrasil.YggdrasilClient;
 import moe.yushi.authlibinjector.yggdrasil.YggdrasilResponseBuilder;
 
@@ -40,10 +41,12 @@ public class MultiQueryProfileFilter implements URLFilter {
 
 	private YggdrasilClient mojangClient;
 	private YggdrasilClient customClient;
+	private String namespace;
 
-	public MultiQueryProfileFilter(YggdrasilClient mojangClient, YggdrasilClient customClient) {
+	public MultiQueryProfileFilter(YggdrasilClient mojangClient, YggdrasilClient customClient, String namespace) {
 		this.mojangClient = mojangClient;
 		this.customClient = customClient;
+		this.namespace = namespace;
 	}
 
 	@Override
@@ -73,9 +76,11 @@ public class MultiQueryProfileFilter implements URLFilter {
 		}
 
 		Optional<GameProfile> response;
-		response = mojangClient.queryProfile(uuid, withSignature);
-		if (response.isEmpty()) {
+		if (uuid.version() == 4) {
+			response = mojangClient.queryProfile(uuid, withSignature);
+		} else {
 			response = customClient.queryProfile(uuid, withSignature);
+			response.ifPresent(profile -> profile.name = new NamespacedID(profile.name, namespace).toString());
 		}
 
 		if (response.isPresent()) {
