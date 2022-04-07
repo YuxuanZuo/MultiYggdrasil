@@ -67,6 +67,8 @@ import moe.yushi.authlibinjector.transform.support.ProxyParameterWorkaround;
 import moe.yushi.authlibinjector.transform.support.SkinWhitelistTransformUnit;
 import moe.yushi.authlibinjector.transform.support.UsernameCharacterCheckTransformer;
 import moe.yushi.authlibinjector.transform.support.YggdrasilKeyTransformUnit;
+import moe.yushi.authlibinjector.transform.support.HasJoinedServerTransformer;
+import moe.yushi.authlibinjector.transform.support.HasJoinedServerResponseTransformer;
 import moe.yushi.authlibinjector.util.JsonUtils;
 import moe.yushi.authlibinjector.yggdrasil.CustomYggdrasilAPIProvider;
 import moe.yushi.authlibinjector.yggdrasil.MojangYggdrasilAPIProvider;
@@ -298,6 +300,8 @@ public final class AuthlibInjector {
 		transformer.units.add(new CitizensTransformer());
 		transformer.units.add(new BungeeCordAllowedCharactersTransformer());
 		transformer.units.add(new UsernameCharacterCheckTransformer());
+		transformer.units.add(new HasJoinedServerTransformer());
+		transformer.units.add(new HasJoinedServerResponseTransformer());
 
 		transformer.units.add(new SkinWhitelistTransformUnit());
 		SkinWhitelistTransformUnit.getWhitelistedDomains().addAll(config.getSkinDomains());
