@@ -108,17 +108,6 @@ public final class AuthlibInjector {
 		}
 	}
 
-	private static Optional<String> getPrefetchedResponse() {
-		String prefetched = System.getProperty("authlibinjector.yggdrasil.prefetched");
-		if (prefetched == null) {
-			prefetched = System.getProperty("org.to2mbn.authlibinjector.config.prefetched");
-			if (prefetched != null) {
-				log(WARNING, "'-Dorg.to2mbn.authlibinjector.config.prefetched=' is deprecated, use '-Dauthlibinjector.yggdrasil.prefetched=' instead");
-			}
-		}
-		return ofNullable(prefetched);
-	}
-
 	private static APIMetadata fetchAPIMetadata(String apiUrl) {
 		if (apiUrl == null || apiUrl.isEmpty()) {
 			log(ERROR, "No authentication server specified");
@@ -131,7 +120,7 @@ public final class AuthlibInjector {
 
 		String metadataResponse;
 
-		Optional<String> prefetched = getPrefetchedResponse();
+		Optional<String> prefetched = ofNullable(System.getProperty("authlibinjector.yggdrasil.prefetched"));
 		if (prefetched.isPresent()) {
 
 			log(DEBUG, "Prefetched metadata detected");

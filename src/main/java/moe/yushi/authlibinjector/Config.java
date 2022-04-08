@@ -20,7 +20,6 @@ package moe.yushi.authlibinjector;
 import static moe.yushi.authlibinjector.util.Logging.log;
 import static moe.yushi.authlibinjector.util.Logging.Level.ERROR;
 import static moe.yushi.authlibinjector.util.Logging.Level.INFO;
-import static moe.yushi.authlibinjector.util.Logging.Level.WARNING;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Proxy.Type;
@@ -34,12 +33,6 @@ public final class Config {
 
 	/*
 	 * See readme for option details.
-	 *
-	 * Deprecated options:
-	 *   -Dauthlibinjector.debug=all
-	 *      replaced by -Dauthlibinjector.debug
-	 *   -Dauthlibinjector.mojang.proxy=...
-	 *     replaced by -Dauthlibinjector.mojangProxy=...
 	 */
 
 	private Config() {}
@@ -56,20 +49,16 @@ public final class Config {
 	public static boolean printUntransformedClass;
 	public static boolean dumpClass;
 	public static boolean httpdDisabled;
+	public static boolean noShowServerName;
 	public static /* nullable */ Proxy mojangProxy;
 	public static Set<String> ignoredPackages;
 	public static FeatureOption mojangNamespace;
 	public static FeatureOption mojangYggdrasilService;
 	public static FeatureOption legacySkinPolyfill;
 	public static FeatureOption mojangAntiFeatures;
-	public static boolean noShowServerName;
 
 	private static void initDebugOptions() {
 		String prop = System.getProperty("authlibinjector.debug");
-		if ("all".equals(prop)) {
-			prop = "";
-			log(WARNING, "'-Dauthlibinjector.debug=all' is deprecated, use '-Dauthlibinjector.debug' instead");
-		}
 		if (prop == null) {
 			// all disabled if param not specified
 		} else if (prop.isEmpty()) {
@@ -149,12 +138,7 @@ public final class Config {
 	private static void initMojangProxy() {
 		String prop = System.getProperty("authlibinjector.mojangProxy");
 		if (prop == null) {
-			prop = System.getProperty("authlibinjector.mojang.proxy");
-			if (prop == null) {
-				return;
-			} else {
-				log(WARNING, "'-Dauthlibinjector.mojang.proxy=' is deprecated, use '-Dauthlibinjector.mojangProxy=' instead");
-			}
+			return;
 		}
 
 		Matcher matcher = Pattern.compile("^(?<protocol>[^:]+)://(?<host>[^/]+)+:(?<port>\\d+)$").matcher(prop);
