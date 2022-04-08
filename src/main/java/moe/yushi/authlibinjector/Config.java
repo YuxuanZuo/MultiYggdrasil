@@ -50,6 +50,7 @@ public final class Config {
 	public static boolean dumpClass;
 	public static boolean httpdDisabled;
 	public static boolean noShowServerName;
+	public static boolean noLogFile;
 	public static /* nullable */ Proxy mojangProxy;
 	public static Set<String> ignoredPackages;
 	public static FeatureOption mojangNamespace;
@@ -185,5 +186,6 @@ public final class Config {
 		mojangAntiFeatures = parseFeatureOption("authlibinjector.mojangAntiFeatures");
 		httpdDisabled = System.getProperty("authlibinjector.disableHttpd") != null;
 		noShowServerName = System.getProperty("authlibinjector.noShowServerName") != null;
+		noLogFile = System.getProperty("authlibinjector.noLogFile") != null;
 	}
 }

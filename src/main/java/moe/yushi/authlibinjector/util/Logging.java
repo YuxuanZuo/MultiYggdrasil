@@ -38,7 +38,7 @@ public final class Logging {
 	private static final FileChannel logfile = openLogFile();
 
 	private static FileChannel openLogFile() {
-		if (System.getProperty("authlibinjector.noLogFile") != null) {
+		if (Config.noLogFile) {
 			log(INFO, "Logging to file is disabled");
 			return null;
 		}
