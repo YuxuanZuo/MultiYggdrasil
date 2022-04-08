@@ -13,13 +13,13 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
-      - name: Restore yushijinhun/authlib-injector.yushi.moe:master cache
-        uses: actions/cache@v1
+      - name: Restore YuxuanZuo/multiyggdrasil.zuoyx.xyz:master cache
+        uses: actions/cache@v3
         with:
           path: ~/deploy
           key: cache-deploy
 
-      - name: Pull yushijinhun/authlib-injector.yushi.moe:master
+      - name: Pull YuxuanZuo/multiyggdrasil.zuoyx.xyz:master
         shell: bash
         run: |
           if [ -d ~/deploy ]; then
@@ -28,7 +28,7 @@ jobs:
             git add --all
             git reset --hard origin/master
           else
-            git clone --single-branch --branch master "git@github.com:yushijinhun/authlib-injector.yushi.moe" ~/deploy
+            git clone --single-branch --branch master "git@github.com:YuxuanZuo/multiyggdrasil.zuoyx.xyz" ~/deploy
           fi
 
       - name: Deploy
@@ -49,7 +49,7 @@ jobs:
           jq -n \
             --arg build_number "$build_number" \
             --arg version "$version_number" \
-            --arg download_url "https://authlib-injector.yushi.moe/artifact/$build_number/$asset_name" \
+            --arg download_url "https://multiyggdrasil.zuoyx.xyz/artifact/$build_number/$asset_name" \
             --arg sha256 "$sha256" \
             '
               {
@@ -84,5 +84,5 @@ jobs:
 
           GitHub Action: https://github.com/${{ github.repository }}/actions/runs/$GITHUB_RUN_ID
           "
-          git push "git@github.com:yushijinhun/authlib-injector.yushi.moe" master:master
+          git push "git@github.com:YuxuanZuo/multiyggdrasil.zuoyx.xyz" master:master
 

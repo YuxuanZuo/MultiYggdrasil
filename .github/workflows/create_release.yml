@@ -17,7 +17,7 @@ jobs:
             exit 1
           fi
 
-          prev_build_number=$(curl -Ss 'https://raw.githubusercontent.com/yushijinhun/authlib-injector.yushi.moe/master/artifacts.json' | jq -r '.artifacts|max_by(.build_number).build_number')
+          prev_build_number=$(curl -Ss 'https://raw.githubusercontent.com/YuxuanZuo/multiyggdrasil.zuoyx.xyz/master/artifacts.json' | jq -r '.artifacts|max_by(.build_number).build_number')
           echo "prev_build_number=$prev_build_number"
           build_number=$(grep -Pom1 '@@release_proposal\.build_number=\K.*(?=@@)' <<< $pr_body) || {
             echo "no build number specified, using auto-increment build number."
@@ -66,14 +66,15 @@ jobs:
             Build number: ${{ steps.parse_pr.outputs.build_number }}  
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ steps.parse_pr.outputs.commit }}
 
-      - name: Setup JDK 8
-        uses: actions/setup-java@v1
+      - name: Setup JDK 17
+        uses: actions/setup-java@v3
         with:
-          java-version: 8
+          distribution: 'microsoft'
+          java-version: 17
 
       - id: build
         name: Build
