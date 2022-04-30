@@ -57,6 +57,7 @@ public final class Config {
 	public static FeatureOption mojangYggdrasilService;
 	public static FeatureOption legacySkinPolyfill;
 	public static FeatureOption mojangAntiFeatures;
+	public static FeatureOption profileKey;
 
 	private static void initDebugOptions() {
 		String prop = System.getProperty("authlibinjector.debug");
@@ -184,6 +185,7 @@ public final class Config {
 		mojangYggdrasilService = parseFeatureOption("authlibinjector.mojangYggdrasilService");
 		legacySkinPolyfill = parseFeatureOption("authlibinjector.legacySkinPolyfill");
 		mojangAntiFeatures = parseFeatureOption("authlibinjector.mojangAntiFeatures");
+		profileKey = parseFeatureOption("authlibinjector.profileKey");
 		httpdDisabled = System.getProperty("authlibinjector.disableHttpd") != null;
 		noShowServerName = System.getProperty("authlibinjector.noShowServerName") != null;
 		noLogFile = System.getProperty("authlibinjector.noLogFile") != null;
