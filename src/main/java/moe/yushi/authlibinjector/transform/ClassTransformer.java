@@ -27,7 +27,6 @@ import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -86,7 +85,7 @@ public class ClassTransformer implements ClassFileTransformer {
 			}
 
 			@Override
-			public Set<String> getStringConstants() {
+			public List<String> getStringConstants() {
 				return TransformHandle.this.getStringConstants();
 			}
 		}
@@ -95,7 +94,7 @@ public class ClassTransformer implements ClassFileTransformer {
 		private final ClassLoader classLoader;
 		private byte[] classBuffer;
 		private ClassReader cachedClassReader;
-		private Set<String> cachedConstants;
+		private List<String> cachedConstants;
 
 		private List<TransformUnit> appliedTransformers;
 		private int minVersion = -1;
@@ -118,8 +117,8 @@ public class ClassTransformer implements ClassFileTransformer {
 			return (getClassReader().getAccess() & ACC_INTERFACE) != 0;
 		}
 
-		private static Set<String> extractStringConstants(ClassReader reader) {
-			Set<String> constants = new HashSet<>();
+		private static List<String> extractStringConstants(ClassReader reader) {
+			List<String> constants = new ArrayList<>();
 			int constantPoolSize = reader.getItemCount();
 			char[] buf = new char[reader.getMaxStringLength()];
 			for (int idx = 1; idx < constantPoolSize; idx++) {
@@ -135,7 +134,7 @@ public class ClassTransformer implements ClassFileTransformer {
 			return constants;
 		}
 
-		private Set<String> getStringConstants() {
+		private List<String> getStringConstants() {
 			if (cachedConstants == null)
 				cachedConstants = extractStringConstants(getClassReader());
 			return cachedConstants;
