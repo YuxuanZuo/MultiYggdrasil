@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021  Haowei Wen <yushijinhun@gmail.com> and contributors
+ * Copyright (C) 2022  Haowei Wen <yushijinhun@gmail.com> and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,6 +43,7 @@ public class ClassTransformer implements ClassFileTransformer {
 	public final List<TransformUnit> units = new CopyOnWriteArrayList<>();
 	public final List<ClassLoadingListener> listeners = new CopyOnWriteArrayList<>();
 	public final Set<String> ignores = Collections.newSetFromMap(new ConcurrentHashMap<>());
+	public final PerformanceMetrics performanceMetrics = new PerformanceMetrics();
 
 	private static class TransformContextImpl implements TransformContext {
 
@@ -167,6 +168,8 @@ public class ClassTransformer implements ClassFileTransformer {
 	public byte[] transform(ClassLoader loader, String internalClassName, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
 		if (internalClassName != null && classfileBuffer != null) {
 			try {
+				long t0 = System.nanoTime();
+
 				String className = internalClassName.replace('/', '.');
 				for (String prefix : ignores) {
 					if (className.startsWith(prefix)) {
@@ -183,6 +186,14 @@ public class ClassTransformer implements ClassFileTransformer {
 				if (Config.printUntransformedClass && transformResult.isEmpty()) {
 					log(DEBUG, "No transformation is applied to [" + className + "]");
 				}
+
+				long t1 = System.nanoTime();
+
+				synchronized (performanceMetrics) {
+					performanceMetrics.classesProcessed++;
+					performanceMetrics.totalTime += t1 - t0;
+				}
+
 				return transformResult.orElse(null);
 			} catch (Throwable e) {
 				log(WARNING, "Failed to transform [" + internalClassName + "]", e);
