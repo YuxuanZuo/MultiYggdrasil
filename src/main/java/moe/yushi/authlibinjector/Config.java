@@ -51,6 +51,7 @@ public final class Config {
 	public static boolean httpdDisabled;
 	public static boolean noShowServerName;
 	public static boolean noLogFile;
+	public static int httpdPort;
 	public static /* nullable */ Proxy mojangProxy;
 	public static Set<String> ignoredPackages;
 	public static FeatureOption mojangNamespace;
@@ -194,5 +195,6 @@ public final class Config {
 		httpdDisabled = System.getProperty("authlibinjector.disableHttpd") != null;
 		noShowServerName = System.getProperty("authlibinjector.noShowServerName") != null;
 		noLogFile = System.getProperty("authlibinjector.noLogFile") != null;
+		httpdPort = Integer.getInteger("authlibinjector.httpdPort", 0);
 	}
 }
