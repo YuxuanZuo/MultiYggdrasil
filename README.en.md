@@ -120,9 +120,13 @@ Configure Minecraft server with the following JVM parameter:
     the player who from the custom authentication server will add a namespace suffix to their username.
     For example:
       Notch@custom
-    If the field "namespace" is not sent by authentication server, the server will issue a default namespace called
-    "custom". If any fields were sent, the server will use the namespace that you defined earlier.
+    If the option "-Dauthlibinjector.namespace" is not set and the field "namespace" is not sent by authentication
+    server, the server will issue a default namespace called "custom". If any fields were sent, the server will use the
+    namespace that you defined earlier.
     
     Some features that conflict with Mojang Yggdrasil server will no longer available anymore:
      - Mojang namespace
+
+-Dauthlibinjector.namespace={namespace string}
+    Set the namespace used by the feature "Mojang authentication server". Allowed characters are a-z0-9._- .
 ```

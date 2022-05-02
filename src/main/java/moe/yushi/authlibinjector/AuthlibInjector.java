@@ -190,10 +190,12 @@ public final class AuthlibInjector {
 	}
 
 	public static String getNamespace(APIMetadata meta) {
-		return ofNullable(meta.getMeta().get("namespace"))
-				.filter(element -> element.getAsJsonPrimitive().isString())
-				.map(JsonUtils::asJsonString)
-				.orElse(UNKNOWN_NAMESPACE);
+		return ofNullable(Config.namespace).orElseGet(
+				() -> ofNullable(meta.getMeta().get("namespace"))
+						.filter(element -> element.getAsJsonPrimitive().isString())
+						.map(JsonUtils::asJsonString)
+						.orElse(UNKNOWN_NAMESPACE)
+		);
 	}
 
 	private static void warnIfHttp(String url) {

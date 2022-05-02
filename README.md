@@ -123,10 +123,13 @@ gradle
     为了将自定义验证服务器角色与正版角色的用户名区别开, 前者的用户名将被添加命名空间后缀.
     例如:
       Notch@custom
-    若验证服务器未设置 namespace 字段, 将使用默认命名空间 custom, 否则使用验证服务器定义的命名空间.
+    若未设置 -Dauthlibinjector.namespace 参数且验证服务器未设置 namespace 字段, 将使用默认命名空间 custom, 否则使用定义的命名空间.
 
     以下与 Mojang 验证服务器冲突的功能将不可用:
      - Mojang 命名空间
+
+-Dauthlibinjector.namespace={命名空间字符串}
+    设置 Mojang 验证服务器 功能使用的命名空间, 允许的字符为 a-z0-9._- .
 ```
 
 ## 捐助
