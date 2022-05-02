@@ -130,6 +130,10 @@ gradle
 
 -Dauthlibinjector.namespace={命名空间字符串}
     设置 Mojang 验证服务器 功能使用的命名空间, 允许的字符为 a-z0-9._- .
+
+-Dauthlibinjector.noNamespaceSuffix
+    不要在用户名中添加命名空间后缀.
+    默认情况下, MultiYggdrasil 会自动在用户名中添加命名空间后缀以允许来自不同验证服务器的角色同时进行游戏, 使用本选项可以禁用该功能.
 ```
 
 ## 捐助

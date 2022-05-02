@@ -129,4 +129,10 @@ Configure Minecraft server with the following JVM parameter:
 
 -Dauthlibinjector.namespace={namespace string}
     Set the namespace used by the feature "Mojang authentication server". Allowed characters are a-z0-9._- .
+
+-Dauthlibinjector.noNamespaceSuffix
+    Do not add namespace suffix to the username.
+    By default, MultiYggdrasil will automatically add namespace suffix to the username to allow players from different
+    authentication servers to play simultaneously.
+    This feature can be disabled using this option.
 ```

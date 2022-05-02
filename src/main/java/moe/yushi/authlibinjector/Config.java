@@ -51,6 +51,7 @@ public final class Config {
 	public static boolean httpdDisabled;
 	public static boolean noShowServerName;
 	public static boolean noLogFile;
+	public static boolean noNamespaceSuffix;
 	public static int httpdPort;
 	public static String namespace;
 	public static /* nullable */ Proxy mojangProxy;
@@ -163,6 +164,7 @@ public final class Config {
 		httpdDisabled = System.getProperty("authlibinjector.disableHttpd") != null;
 		noShowServerName = System.getProperty("authlibinjector.noShowServerName") != null;
 		noLogFile = System.getProperty("authlibinjector.noLogFile") != null;
+		noNamespaceSuffix = System.getProperty("authlibinjector.noNamespaceSuffix") != null;
 		httpdPort = Integer.getInteger("authlibinjector.httpdPort", 0);
 		namespace = System.getProperty("authlibinjector.namespace");
 	}

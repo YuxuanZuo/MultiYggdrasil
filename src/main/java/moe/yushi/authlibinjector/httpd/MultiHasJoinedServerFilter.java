@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import moe.yushi.authlibinjector.Config;
 import moe.yushi.authlibinjector.internal.fi.iki.elonen.IHTTPSession;
 import moe.yushi.authlibinjector.internal.fi.iki.elonen.Response;
 import moe.yushi.authlibinjector.internal.fi.iki.elonen.Status;
@@ -68,7 +69,9 @@ public class MultiHasJoinedServerFilter implements URLFilter {
             }
             if (response.isEmpty()) {
                 response = customClient.hasJoinedServer(params.get("username"), params.get("serverId"), params.get("ip"));
-                response.ifPresent(profile -> profile.name = new NamespacedID(profile.name, namespace).toString());
+                if (!Config.noNamespaceSuffix) {
+                    response.ifPresent(profile -> profile.name = new NamespacedID(profile.name, namespace).toString());
+                }
             }
 
             if (response.isPresent()) {
