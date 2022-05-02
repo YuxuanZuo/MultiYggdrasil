@@ -34,8 +34,12 @@ public class DebugApiEndpoint {
 		if (session.getUri().equals("/debug/metrics") && session.getMethod().equals("GET")) {
 			PerformanceMetrics metrics = AuthlibInjector.getClassTransformer().performanceMetrics;
 			JsonObject response = new JsonObject();
-			response.addProperty("classesProcessed", metrics.getClassesProcessed());
 			response.addProperty("totalTime", metrics.getTotalTime());
+			response.addProperty("matchTime", metrics.getMatchTime());
+			response.addProperty("scanTime", metrics.getScanTime());
+			response.addProperty("analysisTime", metrics.getAnalysisTime());
+			response.addProperty("classesScanned", metrics.getClassesScanned());
+			response.addProperty("classesSkipped", metrics.getClassesSkipped());
 			return Response.newFixedLength(Status.OK, CONTENT_TYPE_JSON, toJsonString(response));
 		} else {
 			return Response.newFixedLength(Status.NOT_FOUND, null, null);
