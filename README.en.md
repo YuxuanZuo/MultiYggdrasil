@@ -1,17 +1,17 @@
  * **English**
- * [简体中文(Chinese Simplified)](https://github.com/yushijinhun/authlib-injector/blob/develop/README.md)
+ * [简体中文(Chinese Simplified)](https://github.com/YuxuanZuo/MultiYggdrasil/blob/develop/README.md)
 
-# authlib-injector
-[![latest release](https://img.shields.io/github/v/tag/yushijinhun/authlib-injector?color=yellow&include_prereleases&label=version&sort=semver&style=flat-square)](https://github.com/yushijinhun/authlib-injector/releases)
-[![ci status](https://img.shields.io/github/workflow/status/yushijinhun/authlib-injector/CI?style=flat-square)](https://github.com/yushijinhun/authlib-injector/actions?query=workflow%3ACI)
-[![license agpl-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg?style=flat-square)](https://github.com/yushijinhun/authlib-injector/blob/develop/LICENSE)
+# MultiYggdrasil
+[![latest release](https://img.shields.io/github/v/tag/YuxuanZuo/MultiYggdrasil?color=yellow&include_prereleases&label=version&sort=semver&style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/releases)
+[![ci status](https://img.shields.io/github/workflow/status/YuxuanZuo/MultiYggdrasil/CI?style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/actions?query=workflow%3ACI)
+[![license agpl-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg?style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/blob/develop/LICENSE)
 
-authlib-injector enables you to build a Minecraft authentication system offering all the features that genuine Minecraft has.
+A fork of authlib-injector with support for coexist with the Mojang authentication server.
 
-**[See the wiki](https://github.com/yushijinhun/authlib-injector/wiki) for documents and detailed descriptions.**
+**For more information about authlib-injector, [see the wiki](https://github.com/yushijinhun/authlib-injector/wiki) for documents and detailed descriptions.**
 
 ## Download
-You can download the latest authlib-injector build from [here](https://authlib-injector.yushi.moe/).
+You can download the latest MultiYggdrasil build from [here](https://MultiYggdrasil.zuoyx.xyz/).
 
 ## Build
 Dependencies: Gradle, JDK 17+
@@ -25,7 +25,7 @@ Build output can be found in `build/libs`.
 ## Deploy
 Configure Minecraft server with the following JVM parameter:
 ```
--javaagent:{/path/to/authlib-injector.jar}={Authentication Server URL}
+-javaagent:{/path/to/MultiYggdrasil.jar}={Authentication Server URL}
 ```
 
 ## Options
@@ -82,7 +82,7 @@ Configure Minecraft server with the following JVM parameter:
 
 -Dauthlibinjector.noShowServerName
     Do not show authentication server name in Minecraft menu screen.
-    By default, authlib-injector alters --versionType parameter to display the authentication server name.
+    By default, MultiYggdrasil alters --versionType parameter to display the authentication server name.
     This feature can be disabled using this option.
 
 -Dauthlibinjector.mojangAntiFeatures={default|enabled|disabled}
@@ -106,7 +106,7 @@ Configure Minecraft server with the following JVM parameter:
     If the profile signing key isn't present, the player will be unable to join servers that enable enforce-secure-profile=true option.
     And other players' Minecraft client will log a warning when receiving an unsigned chat message.
 
--Dauthlibinjector.mojangYggdrasilService={default|enabled|disabled}
+-Dmultiyggdrasil.mojangYggdrasilService={default|enabled|disabled}
     Whether to enable ability to coexist with the Mojang authentication server.
     It's disabled by default if the authentication server does NOT send feature.enable_mojang_yggdrasil_service option.
     
@@ -120,19 +120,26 @@ Configure Minecraft server with the following JVM parameter:
     the player who from the custom authentication server will add a namespace suffix to their username.
     For example:
       Notch@custom
-    If the option "-Dauthlibinjector.namespace" is not set and the field "namespace" is not sent by authentication
+    If the option "-Dmultiyggdrasil.namespace" is not set and the field "namespace" is not sent by authentication
     server, the server will issue a default namespace called "custom". If any fields were sent, the server will use the
     namespace that you defined earlier.
     
     Some features that conflict with Mojang Yggdrasil server will no longer available anymore:
      - Mojang namespace
 
--Dauthlibinjector.namespace={namespace string}
+-Dmultiyggdrasil.namespace={namespace string}
     Set the namespace used by the feature "Mojang authentication server". Allowed characters are a-z0-9._- .
 
--Dauthlibinjector.noNamespaceSuffix
+-Dmultiyggdrasil.noNamespaceSuffix
     Do not add namespace suffix to the username.
     By default, MultiYggdrasil will automatically add namespace suffix to the username to allow players from different
     authentication servers to play simultaneously.
     This feature can be disabled using this option.
 ```
+
+## Credits
+* [authlib-injector](https://github.com/yushijinhun/authlib-injector) by [Haowei Wen](https://github.com/yushijinhun)  
+This is the base of this project, which makes our ideas possible.
+* [Gson](https://github.com/google/gson) by Google Inc.
+* [ASM](https://asm.ow2.io) by INRIA, France Telecom
+* [NanoHttpd](https://github.com/NanoHttpd/nanohttpd)

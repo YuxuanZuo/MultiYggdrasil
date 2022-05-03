@@ -1,17 +1,17 @@
- * [English](https://github.com/yushijinhun/authlib-injector/blob/develop/README.en.md)
+ * [English](https://github.com/YuxuanZuo/MultiYggdrasil/blob/develop/README.en.md)
  * **简体中文(Chinese Simplified)**
 
-# authlib-injector
-[![latest release](https://img.shields.io/github/v/tag/yushijinhun/authlib-injector?color=yellow&include_prereleases&label=version&sort=semver&style=flat-square)](https://github.com/yushijinhun/authlib-injector/releases)
-[![ci status](https://img.shields.io/github/workflow/status/yushijinhun/authlib-injector/CI?style=flat-square)](https://github.com/yushijinhun/authlib-injector/actions?query=workflow%3ACI)
-[![license agpl-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg?style=flat-square)](https://github.com/yushijinhun/authlib-injector/blob/develop/LICENSE)
+# MultiYggdrasil
+[![latest release](https://img.shields.io/github/v/tag/YuxuanZuo/MultiYggdrasil?color=yellow&include_prereleases&label=version&sort=semver&style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/releases)
+[![ci status](https://img.shields.io/github/workflow/status/YuxuanZuo/MultiYggdrasil/CI?style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/actions?query=workflow%3ACI)
+[![license agpl-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg?style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/blob/develop/LICENSE)
 
-通过运行时修改 authlib 实现游戏外登录，并为 Yggdrasil 服务端的实现提供规范。
+一个 [authlib-injector](https://github.com/yushijinhun/authlib-injector) 的分支, 添加了与 Mojang 验证服务器共存的支持.
 
-**关于该项目的详细介绍见 [wiki](https://github.com/yushijinhun/authlib-injector/wiki)。**
+**关于 authlib-injector 的详细介绍见该项目的 [wiki](https://github.com/yushijinhun/authlib-injector/wiki)。**
 
 ## 获取
-您可以从[这里](https://authlib-injector.yushi.moe/)获取最新的 authlib-injector。
+您可以从[这里](https://multiyggdrasil.zuoyx.xyz/)获取最新的 MultiYggdrasil。
 
 ## 构建
 构建依赖：Gradle、JDK 17+。
@@ -25,17 +25,17 @@ gradle
 ## 部署
 通过添加以下 JVM 参数来配置：
 ```
--javaagent:{authlib-injector.jar 的路径}={验证服务器 URL (API 地址)}
+-javaagent:{MultiYggdrasil.jar 的路径}={验证服务器 URL (API 地址)}
 ```
 
 ## 参数
 ```
 -Dauthlibinjector.noLogFile
     不要将日志输出到文件.
-    默认情况下, authlib-injector 会将日志输出到控制台以及当前目录下的 authlib-injector.log 文件.
+    默认情况下, MultiYggdrasil 会将日志输出到控制台以及当前目录下的 MultiYggdrasil.log 文件.
     开启此选项后, 日志仅会输出到控制台.
 
-    需要注意的是, authlib-injector 的日志是不会输出到 Minecraft 服务端/客户端的日志文件中的.
+    需要注意的是, MultiYggdrasil 的日志是不会输出到 Minecraft 服务端/客户端的日志文件中的.
 
     每次启动时, 日志文件都会被清空. 如果有多个进程使用同一个日志文件, 则只有最早启动的会成功打开日志文件.
 
@@ -90,7 +90,7 @@ gradle
 
 -Dauthlibinjector.noShowServerName
     不要在 Minecraft 主界面展示验证服务器名称.
-    默认情况下, authlib-injector 通过更改 --versionType 参数来在 Minecraft 主界面显示验证服务器名称, 使用本选项可以禁用该功能.
+    默认情况下, MultiYggdrasil 通过更改 --versionType 参数来在 Minecraft 主界面显示验证服务器名称, 使用本选项可以禁用该功能.
 
 -Dauthlibinjector.mojangAntiFeatures={default|enabled|disabled}
     设置是否开启 Minecraft 的部分 anti-feature.
@@ -113,7 +113,7 @@ gradle
     当缺少消息签名密钥时, 玩家将无法进入设置了 enforce-secure-profile=true 选项的服务器.
     而当其他玩家的客户端在收到无有效签名的聊天消息时, 会在日志中记录警告.
 
--Dauthlibinjector.mojangYggdrasilService={default|enabled|disabled}
+-Dmultiyggdrasil.mojangYggdrasilService={default|enabled|disabled}
     设置是否与 Mojang 验证服务器共存.
     若验证服务器未设置 feature.enable_mojang_yggdrasil_service 选项, 则默认禁用.
 
@@ -123,18 +123,22 @@ gradle
     为了将自定义验证服务器角色与正版角色的用户名区别开, 前者的用户名将被添加命名空间后缀.
     例如:
       Notch@custom
-    若未设置 -Dauthlibinjector.namespace 参数且验证服务器未设置 namespace 字段, 将使用默认命名空间 custom, 否则使用定义的命名空间.
+    若未设置 -Dmultiyggdrasil.namespace 参数且验证服务器未设置 namespace 字段, 将使用默认命名空间 custom, 否则使用定义的命名空间.
 
     以下与 Mojang 验证服务器冲突的功能将不可用:
      - Mojang 命名空间
 
--Dauthlibinjector.namespace={命名空间字符串}
+-Dmultiyggdrasil.namespace={命名空间字符串}
     设置 Mojang 验证服务器 功能使用的命名空间, 允许的字符为 a-z0-9._- .
 
--Dauthlibinjector.noNamespaceSuffix
+-Dmultiyggdrasil.noNamespaceSuffix
     不要在用户名中添加命名空间后缀.
     默认情况下, MultiYggdrasil 会自动在用户名中添加命名空间后缀以允许来自不同验证服务器的角色同时进行游戏, 使用本选项可以禁用该功能.
 ```
 
-## 捐助
-BMCLAPI 为 authlib-injector 提供了[下载镜像站](https://github.com/yushijinhun/authlib-injector/wiki/%E8%8E%B7%E5%8F%96-authlib-injector#bmclapi-%E9%95%9C%E5%83%8F)。如果您想要支持 authlib-injector 的开发，您可以[捐助 BMCLAPI](https://bmclapidoc.bangbang93.com/)。
+## Credits
+ * [authlib-injector](https://github.com/yushijinhun/authlib-injector) by [Haowei Wen](https://github.com/yushijinhun)  
+这是本项目的基础, 它使得我们的想法成为可能.
+ * [Gson](https://github.com/google/gson) by Google Inc.
+ * [ASM](https://asm.ow2.io) by INRIA, France Telecom
+ * [NanoHttpd](https://github.com/NanoHttpd/nanohttpd)
