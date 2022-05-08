@@ -5,17 +5,12 @@
 
 在参与到本项目之前，希望您能花一些时间阅读下面的指引，它们或许能为你提供一些帮助。
 
-## 提问 & 交流
-如果您对本项目有任何疑问，您可以通过以下方式向他人提问：
-* 开发讨论 QQ 群：926979364
-* Telegram 群组：[@authlib_injector](https://t.me/authlib_injector)
-
 ## Bug 反馈
 如果您希望报告 bug，建议您遵循以下步骤：
 * 请检查您的相关软件是否都**更新到了最新版本**，您遇到的 bug 可能已经在新版本中修复。
 * 在 GitHub Issues 中搜索这个 bug 是否已经被报告过了。如果有反馈相同 bug 的 issue，请直接在 issue 下留言，**不要再开一个 issue**。
 
-如果以上步骤没能解决您的问题，请在 GitHub Issues 上[提交一个 issue](https://github.com/yushijinhun/authlib-injector/issues/new)。
+如果以上步骤没能解决您的问题，请在 GitHub Issues 上[提交一个 issue](https://github.com/YuxuanZuo/MultiYggdrasil/issues/new)。
 填写 issue 时请务必注意以下几点，这能帮助开发者更快地判断问题：
 * 尽量使用准确、清晰的语言描述问题。
 * **详细描述**重现问题的方法。您应尽量详尽、具体地描述问题出现的场景，尤其是出现问题前的**操作步骤**，这可以帮助开发者更快重现您遇到的问题。

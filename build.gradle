@@ -1,6 +1,6 @@
 plugins {
-	id 'com.github.johnrengelman.shadow' version '7.0.0'
-	id 'com.palantir.git-version' version '0.12.3'
+	id 'com.github.johnrengelman.shadow' version '7.1.2'
+	id 'com.palantir.git-version' version '0.13.0'
 	id 'java'
 }
 
@@ -9,15 +9,20 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.ow2.asm:asm:9.2'
-	testImplementation 'junit:junit:4.13.2'
+	implementation 'com.google.code.gson:gson:2.9.0'
+	implementation 'org.ow2.asm:asm:9.3'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
 }
 
-sourceCompatibility = 8
+test {
+	useJUnitPlatform()
+}
+
+sourceCompatibility = 17
 
 def buildNumber = System.getenv('AI_BUILD_NUMBER')
 def gitInfo = versionDetails()
-version = System.getenv('AI_VERSION_NUMBER') ?: 'snapshot';
+version = System.getenv('AI_VERSION_NUMBER') ?: 'snapshot'
 if (!gitInfo.isCleanTag) version += '.dirty'
 
 jar {
@@ -25,11 +30,11 @@ jar {
 		attributes (
 			'Implementation-Title': project.name,
 			'Implementation-Version': project.version,
-			'Implementation-Vendor': 'yushijinhun',
+			'Implementation-Vendor': 'YuxuanZuo',
 			'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-			'Automatic-Module-Name': 'moe.yushi.authlibinjector',
-			'Premain-Class': 'moe.yushi.authlibinjector.Premain',
-			'Agent-Class': 'moe.yushi.authlibinjector.Premain',
+			'Automatic-Module-Name': 'xyz.zuoyx.multiyggdrasil',
+			'Premain-Class': 'xyz.zuoyx.multiyggdrasil.Premain',
+			'Agent-Class': 'xyz.zuoyx.multiyggdrasil.Premain',
 			'Can-Retransform-Classes': true,
 			'Can-Redefine-Classes': true,
 			'Git-Commit': gitInfo.gitHashFull,
@@ -41,18 +46,18 @@ jar {
 
 processResources {
 	from('LICENSE') {
-		rename('LICENSE', 'authlib-injector.txt')
+		rename('LICENSE', 'multiyggdrasil.txt')
 		into 'META-INF/licenses'
 	}
 }
 
 shadowJar {
-	classifier = null
-
 	exclude 'META-INF/maven/**'
 	exclude 'module-info.class'
+	exclude '**/module-info.class'
 
-	relocate 'org.objectweb.asm', 'moe.yushi.authlibinjector.internal.org.objectweb.asm'
+	relocate 'com.google.gson', 'xyz.zuoyx.multiyggdrasil.internal.com.google.gson'
+	relocate 'org.objectweb.asm', 'xyz.zuoyx.multiyggdrasil.internal.org.objectweb.asm'
 }
 
 defaultTasks 'clean', 'shadowJar'
