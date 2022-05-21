@@ -122,7 +122,7 @@ gradle
 
     为了将自定义验证服务器角色与正版角色的用户名区别开, 前者的用户名将被添加命名空间后缀.
     例如:
-      Notch@custom
+      Notch.custom
     若未设置 -Dmultiyggdrasil.namespace 参数且验证服务器未设置 namespace 字段, 将使用默认命名空间 custom, 否则使用定义的命名空间.
 
     以下与 Mojang 验证服务器冲突的功能将不可用:
