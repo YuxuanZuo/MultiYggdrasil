@@ -119,7 +119,7 @@ Configure Minecraft server with the following JVM parameter:
     In order to distinguish the username of players from the custom authentication server from that of the Mojang server,
     the player who from the custom authentication server will add a namespace suffix to their username.
     For example:
-      Notch@custom
+      Notch.custom
     If the option "-Dmultiyggdrasil.namespace" is not set and the field "namespace" is not sent by authentication
     server, the server will issue a default namespace called "custom". If any fields were sent, the server will use the
     namespace that you defined earlier.
