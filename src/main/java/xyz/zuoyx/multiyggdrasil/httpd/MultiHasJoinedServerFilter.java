@@ -64,7 +64,7 @@ public class MultiHasJoinedServerFilter implements URLFilter {
             try {
                 response = mojangClient.hasJoinedServer(params.get("username"), params.get("serverId"), params.get("ip"));
             } catch (UncheckedIOException e) {
-                log(ERROR, "An error occurred while verifying username [ " + params.get("username") + " ]:\n" +
+                log(ERROR, "An error occurred while verifying username [ " + params.get("username") + " ] at Mojang Yggdrasil server:\n" +
                         e.getCause());
             }
             if (response.isEmpty()) {
