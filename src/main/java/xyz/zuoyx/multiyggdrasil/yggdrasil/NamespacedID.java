@@ -29,12 +29,14 @@ public class NamespacedID {
 
     private static final Pattern VALID_NAMESPACE = Pattern.compile("[a-z0-9._-]+");
 
-    private final String namespace;
     private final String id;
+    private final String namespace;
+    private final boolean isMojangName;
 
     public NamespacedID(String id) {
-        this.namespace = MOJANG_NAMESPACE;
         this.id = id;
+        this.namespace = MOJANG_NAMESPACE;
+        this.isMojangName = true;
     }
 
     public NamespacedID(String id, String namespace) {
@@ -46,32 +48,30 @@ public class NamespacedID {
         }
 
         this.id = id;
-    }
-
-    public String getNamespace() {
-        return namespace;
+        this.isMojangName = false;
     }
 
     public String getId() {
+        return namespace;
+    }
+
+    public String getNamespace() {
         return id;
     }
 
     public static NamespacedID parse(String name) {
         int separatorIndex = name.lastIndexOf(NAMESPACE_SEPARATOR);
-        if (separatorIndex < 0) {
-            return new NamespacedID(name);
-        } else if (separatorIndex == name.length() - 1) {
-            String id = name.substring(0, separatorIndex);
-            return new NamespacedID(id);
-        } else {
+        if (separatorIndex > 0 && separatorIndex != name.length() - 1) {
             String id = name.substring(0, separatorIndex);
             String namespace = name.substring(separatorIndex + 1);
             return new NamespacedID(id, namespace);
+        } else {
+            return new NamespacedID(name);
         }
     }
 
     public boolean isMojangName() {
-        return this.namespace.equals(MOJANG_NAMESPACE);
+        return this.isMojangName;
     }
 
     public boolean isCustomName(String namespace) {
