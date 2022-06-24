@@ -24,6 +24,7 @@ import static java.util.Optional.ofNullable;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.asBytes;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.asString;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.removeNewLines;
+import static xyz.zuoyx.multiyggdrasil.util.JsonUtils.asBoolean;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.log;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.Level.DEBUG;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.Level.ERROR;
@@ -231,18 +232,14 @@ public final class MultiYggdrasil {
 		YggdrasilClient customClient = new YggdrasilClient(new CustomYggdrasilAPIProvider(config));
 		YggdrasilClient mojangClient = new YggdrasilClient(new MojangYggdrasilAPIProvider(), Config.mojangProxy);
 
-		boolean legacySkinPolyfillDefault = !Boolean.TRUE.equals(ofNullable(config.getMeta().get("feature.legacy_skin_api"))
-				.map(element -> element.getAsJsonPrimitive().getAsBoolean())
-				.orElse(Boolean.FALSE));
+		boolean legacySkinPolyfillDefault = !Boolean.TRUE.equals(asBoolean(config.getMeta().get("feature.legacy_skin_api")));
 		if (Config.legacySkinPolyfill.isEnabled(legacySkinPolyfillDefault)) {
 			filters.add(new LegacySkinAPIFilter(customClient));
 		} else {
 			log(INFO, "Disabled legacy skin API polyfill");
 		}
 
-		boolean mojangYggdrasilServiceDefault = Boolean.TRUE.equals(ofNullable(config.getMeta().get("feature.enable_mojang_yggdrasil_service"))
-				.map(element -> element.getAsJsonPrimitive().getAsBoolean())
-				.orElse(Boolean.FALSE));
+		boolean mojangYggdrasilServiceDefault = Boolean.TRUE.equals(asBoolean(config.getMeta().get("feature.enable_mojang_yggdrasil_service")));
 		if (Config.mojangYggdrasilService.isEnabled(mojangYggdrasilServiceDefault)) {
 			log(INFO, "Mojang Yggdrasil service is enabled, Mojang namespace will be disabled!");
 			String namespace = getNamespace(config);
@@ -253,9 +250,7 @@ public final class MultiYggdrasil {
 			log(INFO, "Disabled Mojang Yggdrasil service");
 		}
 
-		boolean mojangNamespaceDefault = !Boolean.TRUE.equals(ofNullable(config.getMeta().get("feature.no_mojang_namespace"))
-				.map(element -> element.getAsJsonPrimitive().getAsBoolean())
-				.orElse(Boolean.FALSE));
+		boolean mojangNamespaceDefault = !Boolean.TRUE.equals(asBoolean(config.getMeta().get("feature.no_mojang_namespace")));
 		if (Config.mojangNamespace.isEnabled(mojangNamespaceDefault) && !Config.mojangYggdrasilService.isEnabled(mojangYggdrasilServiceDefault)) {
 			filters.add(new QueryUUIDsFilter(mojangClient, customClient));
 			filters.add(new QueryProfileFilter(mojangClient, customClient));
@@ -263,14 +258,12 @@ public final class MultiYggdrasil {
 			log(INFO, "Disabled Mojang namespace");
 		}
 
-		boolean mojangAntiFeaturesDefault = Boolean.TRUE.equals(ofNullable(config.getMeta().get("feature.enable_mojang_anti_features"))
-				.map(element -> element.getAsJsonPrimitive().getAsBoolean())
-				.orElse(Boolean.FALSE));
+		boolean mojangAntiFeaturesDefault = Boolean.TRUE.equals(asBoolean(config.getMeta().get("feature.enable_mojang_anti_features")));
 		if (!Config.mojangAntiFeatures.isEnabled(mojangAntiFeaturesDefault)) {
 			filters.add(new AntiFeaturesFilter());
 		}
 
-		boolean profileKeyDefault = Boolean.TRUE.equals(config.getMeta().get("feature.enable_profile_key"));
+		boolean profileKeyDefault = Boolean.TRUE.equals(asBoolean(config.getMeta().get("feature.enable_profile_key")));
 		if (!Config.profileKey.isEnabled(profileKeyDefault)) {
 			filters.add(new ProfileKeyFilter());
 		}
