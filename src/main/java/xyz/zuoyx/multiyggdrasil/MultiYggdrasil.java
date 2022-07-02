@@ -65,6 +65,7 @@ import xyz.zuoyx.multiyggdrasil.transform.support.BungeeCordAllowedCharactersTra
 import xyz.zuoyx.multiyggdrasil.transform.support.CitizensTransformer;
 import xyz.zuoyx.multiyggdrasil.transform.support.ConstantURLTransformUnit;
 import xyz.zuoyx.multiyggdrasil.transform.support.MainArgumentsTransformer;
+import xyz.zuoyx.multiyggdrasil.transform.support.PaperUsernameCheckTransformer;
 import xyz.zuoyx.multiyggdrasil.transform.support.ProxyParameterWorkaround;
 import xyz.zuoyx.multiyggdrasil.transform.support.SkinWhitelistTransformUnit;
 import xyz.zuoyx.multiyggdrasil.transform.support.UsernameCharacterCheckTransformer;
@@ -302,6 +303,7 @@ public final class MultiYggdrasil {
 		transformer.units.add(new CitizensTransformer());
 		transformer.units.add(new BungeeCordAllowedCharactersTransformer());
 		transformer.units.add(new UsernameCharacterCheckTransformer());
+		transformer.units.add(new PaperUsernameCheckTransformer());
 		transformer.units.add(new HasJoinedServerTransformer());
 		transformer.units.add(new HasJoinedServerResponseTransformer());
 
