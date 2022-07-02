@@ -301,11 +301,17 @@ public final class MultiYggdrasil {
 		transformer.units.add(new MainArgumentsTransformer());
 		transformer.units.add(new ConstantURLTransformUnit(urlProcessor));
 		transformer.units.add(new CitizensTransformer());
-		transformer.units.add(new BungeeCordAllowedCharactersTransformer());
-		transformer.units.add(new UsernameCharacterCheckTransformer());
-		transformer.units.add(new PaperUsernameCheckTransformer());
 		transformer.units.add(new HasJoinedServerTransformer());
 		transformer.units.add(new HasJoinedServerResponseTransformer());
+
+		boolean usernameCheckDefault = Boolean.TRUE.equals(asBoolean(config.getMeta().get("feature.username_check")));
+		if (Config.usernameCheck.isEnabled(usernameCheckDefault)) {
+			log(INFO, "Username check is enforced");
+		} else {
+			transformer.units.add(new BungeeCordAllowedCharactersTransformer());
+			transformer.units.add(new UsernameCharacterCheckTransformer());
+			transformer.units.add(new PaperUsernameCheckTransformer());
+		}
 
 		transformer.units.add(new SkinWhitelistTransformUnit());
 		SkinWhitelistTransformUnit.getWhitelistedDomains().addAll(config.getSkinDomains());

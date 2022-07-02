@@ -62,6 +62,7 @@ public final class Config {
 	public static FeatureOption legacySkinPolyfill;
 	public static FeatureOption mojangAntiFeatures;
 	public static FeatureOption profileKey;
+	public static FeatureOption usernameCheck;
 
 	private static void initDebugOptions() {
 		String prop = System.getProperty("authlibinjector.debug");
@@ -162,6 +163,7 @@ public final class Config {
 		legacySkinPolyfill = parseFeatureOption("authlibinjector.legacySkinPolyfill");
 		mojangAntiFeatures = parseFeatureOption("authlibinjector.mojangAntiFeatures");
 		profileKey = parseFeatureOption("authlibinjector.profileKey");
+		usernameCheck = parseFeatureOption("authlibinjector.usernameCheck");
 		httpdDisabled = System.getProperty("authlibinjector.disableHttpd") != null;
 		noShowServerName = System.getProperty("authlibinjector.noShowServerName") != null;
 		noLogFile = System.getProperty("authlibinjector.noLogFile") != null;
