@@ -16,14 +16,13 @@
  */
 package xyz.zuoyx.multiyggdrasil.httpd;
 
-import java.io.IOException;
 import java.util.Optional;
 import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.IHTTPSession;
 import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Response;
 import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Status;
 
 /**
- * Intercepts Minecraft's request to https://api.minecraftservices.com/player/certificates,
+ * Intercepts Minecraft's request to <a href="https://api.minecraftservices.com/player/certificates">...</a>,
  * and returns an empty response.
  */
 public class ProfileKeyFilter implements URLFilter {
@@ -34,7 +33,7 @@ public class ProfileKeyFilter implements URLFilter {
 	}
 
 	@Override
-	public Optional<Response> handle(String domain, String path, IHTTPSession session) throws IOException {
+	public Optional<Response> handle(String domain, String path, IHTTPSession session) {
 		if (domain.equals("api.minecraftservices.com") && path.equals("/player/certificates") && session.getMethod().equals("POST")) {
 			return Optional.of(Response.newFixedLength(Status.NO_CONTENT, null, null));
 		}

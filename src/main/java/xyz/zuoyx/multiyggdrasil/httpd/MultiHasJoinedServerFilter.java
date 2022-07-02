@@ -20,7 +20,6 @@ import static xyz.zuoyx.multiyggdrasil.util.IOUtils.CONTENT_TYPE_JSON;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.Level.ERROR;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.log;
 
-import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -53,7 +52,7 @@ public class MultiHasJoinedServerFilter implements URLFilter {
     }
 
     @Override
-    public Optional<Response> handle(String domain, String path, IHTTPSession session) throws IOException {
+    public Optional<Response> handle(String domain, String path, IHTTPSession session) {
         if (domain.equals("sessionserver.mojang.com") && path.equals("/session/minecraft/hasJoined") && session.getMethod().equals("GET")) {
             Map<String, String> params = new LinkedHashMap<>();
             session.getParameters().forEach(

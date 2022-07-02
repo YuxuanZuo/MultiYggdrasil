@@ -27,7 +27,7 @@ import xyz.zuoyx.multiyggdrasil.transform.TransformUnit;
 /**
  * Hacks BungeeCord to allow non-ASCII characters in username.
  *
- * Since <https://github.com/SpigotMC/BungeeCord/commit/3008d7ef2f50de7e3d38e76717df72dac7fe0da3>,
+ * Since <a href="https://github.com/SpigotMC/BungeeCord/commit/3008d7ef2f50de7e3d38e76717df72dac7fe0da3">...</a>,
  * BungeeCord allows only ASCII characters in username when online-mode is on.
  */
 public class BungeeCordAllowedCharactersTransformer implements TransformUnit {
