@@ -142,6 +142,16 @@ Configure Minecraft server with the following JVM parameter:
     This feature can be disabled using this option.
 ```
 
+## License
+This work is licensed under the [GNU Affero General Public License v3.0](https://github.com/YuxuanZuo/MultiYggdrasil/blob/develop/LICENSE) or later, with the "MULTIYGGDRASIL" exception.
+
+> **"MULTIYGGDRASIL" EXCEPTION TO THE AGPL**
+>
+> As a special exception, using this work in the following ways does not cause your program to be covered by the AGPL:
+> 1. Bundling the unaltered binary form of this work in your program without statically or dynamically linking to it; or
+> 2. Interacting with this work through the provided inter-process communication interface, such as the HTTP API; or
+> 3. Loading this work as a Java Agent into a Java Virtual Machine.
+
 ## Credits
 * [authlib-injector](https://github.com/yushijinhun/authlib-injector) by [Haowei Wen](https://github.com/yushijinhun)  
 This is the base of this project, which makes our ideas possible.
