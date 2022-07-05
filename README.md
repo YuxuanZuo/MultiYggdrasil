@@ -133,6 +133,9 @@ gradle
     以下与 Mojang 验证服务器冲突的功能将不可用:
      - Mojang 命名空间
 
+-Dmultiyggdrasil.priorityVerifyingCustomName
+    在登录游戏服务器时优先验证来自自定义验证服务器的角色（默认为优先验证正版角色）.
+
 -Dmultiyggdrasil.namespace={命名空间字符串}
     设置 Mojang 验证服务器 功能使用的命名空间, 允许的字符为 a-z0-9._- .
 

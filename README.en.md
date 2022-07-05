@@ -132,6 +132,10 @@ Configure Minecraft server with the following JVM parameter:
     Some features that conflict with Mojang Yggdrasil server will no longer available anymore:
      - Mojang namespace
 
+-Dmultiyggdrasil.priorityVerifyingCustomName
+    Make the custom authentication server a priority to verify the player when logging into the game server
+    (The default is to give priority to verification of the genuine player).
+
 -Dmultiyggdrasil.namespace={namespace string}
     Set the namespace used by the feature "Mojang authentication server". Allowed characters are a-z0-9._- .
 
