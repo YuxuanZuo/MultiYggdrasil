@@ -113,6 +113,11 @@ gradle
     当缺少消息签名密钥时, 玩家将无法进入设置了 enforce-secure-profile=true 选项的服务器.
     而当其他玩家的客户端在收到无有效签名的聊天消息时, 会在日志中记录警告.
 
+-Dauthlibinjector.usernameCheck={default|enabled|disabled}
+    是否启用玩家用户名检查, 若禁用, 则 authlib-injector 将关闭 Minecraft、BungeeCord 和 Paper 的用户名检查功能.
+    若验证服务器未设置 feature.usernameCheck 选项, 则默认禁用.
+    注意, 开启此功能将导致用户名包含非英文字符的玩家无法进入服务器.
+
 -Dmultiyggdrasil.mojangYggdrasilService={default|enabled|disabled}
     设置是否与 Mojang 验证服务器共存.
     若验证服务器未设置 feature.enable_mojang_yggdrasil_service 选项, 则默认禁用.
@@ -128,6 +133,9 @@ gradle
     以下与 Mojang 验证服务器冲突的功能将不可用:
      - Mojang 命名空间
 
+-Dmultiyggdrasil.priorityVerifyingCustomName
+    在登录游戏服务器时优先验证来自自定义验证服务器的角色（默认为优先验证正版角色）.
+
 -Dmultiyggdrasil.namespace={命名空间字符串}
     设置 Mojang 验证服务器 功能使用的命名空间, 允许的字符为 a-z0-9._- .
 
@@ -135,6 +143,16 @@ gradle
     不要在用户名中添加命名空间后缀.
     默认情况下, MultiYggdrasil 会自动在用户名中添加命名空间后缀以允许来自不同验证服务器的角色同时进行游戏, 使用本选项可以禁用该功能.
 ```
+
+## 许可
+本程序使用 [GNU Affero General Public License v3.0 or later](https://github.com/YuxuanZuo/MultiYggdrasil/blob/develop/LICENSE) 许可，并附有以下例外：
+
+> **AGPL 的例外情况:**
+>
+> 作为特例，如果您的程序通过以下方式利用本作品，则相应的行为不会导致您的作品被 AGPL 协议涵盖。
+> 1. 您的程序通过打包的方式包含本作品未经修改的二进制形式，而没有静态或动态地链接到本作品；或
+> 2. 您的程序通过本作品提供的进程间通信接口（如 HTTP API）进行交互；或
+> 3. 您的程序将本作品作为 Java Agent 加载进 Java 虚拟机。
 
 ## Credits
  * [authlib-injector](https://github.com/yushijinhun/authlib-injector) by [Haowei Wen](https://github.com/yushijinhun)  

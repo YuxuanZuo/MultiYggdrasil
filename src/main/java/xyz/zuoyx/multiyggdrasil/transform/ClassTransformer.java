@@ -132,7 +132,7 @@ public class ClassTransformer implements ClassFileTransformer {
 			for (int i = units.length - 1; i >= 0; i--) {
 				TransformContextImpl ctx = new TransformContextImpl();
 				Optional<ClassVisitor> visitor = units[i].transform(classLoader, className, chain, ctx);
-				if (!visitor.isPresent())
+				if (visitor.isEmpty())
 					continue;
 				ctxs[i] = ctx;
 				chain = visitor.get();

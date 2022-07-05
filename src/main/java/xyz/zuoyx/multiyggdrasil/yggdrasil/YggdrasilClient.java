@@ -115,6 +115,10 @@ public class YggdrasilClient {
 		return Optional.of(parseGameProfile(parseJson(responseText).getAsJsonObject()));
 	}
 
+	public YggdrasilAPIProvider getApiProvider() {
+		return apiProvider;
+	}
+
 	private GameProfile parseGameProfile(JsonObject json) {
 		GameProfile profile = new GameProfile();
 		profile.id = parseUnsignedUUID(asJsonString(json.get("id")));

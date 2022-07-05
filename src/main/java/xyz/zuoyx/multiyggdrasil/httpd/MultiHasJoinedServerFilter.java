@@ -20,30 +20,32 @@ import static xyz.zuoyx.multiyggdrasil.util.IOUtils.CONTENT_TYPE_JSON;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.Level.ERROR;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.log;
 
-import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import xyz.zuoyx.multiyggdrasil.Config;
 import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.IHTTPSession;
 import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Response;
 import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Status;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.GameProfile;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.NamespacedID;
+import xyz.zuoyx.multiyggdrasil.yggdrasil.YggdrasilAPIProvider;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.YggdrasilClient;
+import xyz.zuoyx.multiyggdrasil.yggdrasil.MojangYggdrasilAPIProvider;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.YggdrasilResponseBuilder;
 
 public class MultiHasJoinedServerFilter implements URLFilter {
 
-    private YggdrasilClient mojangClient;
-    private YggdrasilClient customClient;
+    private YggdrasilClient[] clients;
     private String namespace;
 
-    public MultiHasJoinedServerFilter(YggdrasilClient mojangClient, YggdrasilClient customClient, String namespace) {
-        this.mojangClient = mojangClient;
-        this.customClient = customClient;
+    public MultiHasJoinedServerFilter(YggdrasilClient[] clients) {
+        this.clients = clients;
+    }
+
+    public MultiHasJoinedServerFilter(YggdrasilClient[] clients, String namespace) {
+        this.clients = clients;
         this.namespace = namespace;
     }
 
@@ -53,7 +55,7 @@ public class MultiHasJoinedServerFilter implements URLFilter {
     }
 
     @Override
-    public Optional<Response> handle(String domain, String path, IHTTPSession session) throws IOException {
+    public Optional<Response> handle(String domain, String path, IHTTPSession session) {
         if (domain.equals("sessionserver.mojang.com") && path.equals("/session/minecraft/hasJoined") && session.getMethod().equals("GET")) {
             Map<String, String> params = new LinkedHashMap<>();
             session.getParameters().forEach(
@@ -61,16 +63,20 @@ public class MultiHasJoinedServerFilter implements URLFilter {
             );
 
             Optional<GameProfile> response = Optional.empty();
-            try {
-                response = mojangClient.hasJoinedServer(params.get("username"), params.get("serverId"), params.get("ip"));
-            } catch (UncheckedIOException e) {
-                log(ERROR, "An error occurred while verifying username [ " + params.get("username") + " ] at Mojang Yggdrasil server:\n" +
-                        e.getCause());
-            }
-            if (response.isEmpty()) {
-                response = customClient.hasJoinedServer(params.get("username"), params.get("serverId"), params.get("ip"));
-                if (!Config.noNamespaceSuffix) {
-                    response.ifPresent(profile -> profile.name = new NamespacedID(profile.name, namespace).toString());
+            for (YggdrasilClient client : clients) {
+                YggdrasilAPIProvider apiProvider = client.getApiProvider();
+                try {
+                    response = client.hasJoinedServer(params.get("username"), params.get("serverId"), params.get("ip"));
+                } catch (UncheckedIOException e) {
+                    log(ERROR, "An error occurred while verifying username [ " + params.get("username") + " ] at [ " + apiProvider + " ]:\n" +
+                            e.getCause());
+                    continue;
+                }
+                if (response.isPresent()) {
+                    if (namespace != null && !(apiProvider instanceof MojangYggdrasilAPIProvider)) {
+                        response.ifPresent(profile -> profile.name = new NamespacedID(profile.name, namespace).toString());
+                    }
+                    break;
                 }
             }
 

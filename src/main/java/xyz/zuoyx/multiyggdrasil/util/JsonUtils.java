@@ -41,6 +41,13 @@ public final class JsonUtils {
 	public static String asJsonString(JsonElement json) {
 		return json.getAsJsonPrimitive().getAsString();
 	}
+	public static boolean asBoolean(JsonElement json) {
+		if (json != null) {
+			return json.getAsJsonPrimitive().getAsBoolean();
+		} else {
+			return false;
+		}
+	}
 
 	public static List<JsonElement> toJavaList(JsonArray json) {
 		Type listType = new TypeToken<List<JsonElement>>(){}.getType();

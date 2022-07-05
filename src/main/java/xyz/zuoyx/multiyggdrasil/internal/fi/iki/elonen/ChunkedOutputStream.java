@@ -55,7 +55,7 @@ import java.io.OutputStream;
 /**
  * Output stream that will automatically send every write to the wrapped
  * OutputStream according to chunked transfer:
- * http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1
+ * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1">...</a>
  */
 class ChunkedOutputStream extends FilterOutputStream {
 

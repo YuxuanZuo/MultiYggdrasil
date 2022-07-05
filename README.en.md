@@ -101,10 +101,15 @@ Configure Minecraft server with the following JVM parameter:
 -Dauthlibinjector.profileKey={default|enabled|disabled}
     Whether to enable the profile signing key feature. This feature is introduced in 22w17a, and is used to implement the multiplayer secure chat signing.
     If this this feature is enabled, Minecraft will send a POST request to /minecraftservices/player/certificates to retrieve the key pair issued by the authentication server.
-    It's enabled by default if the authentication server sends feature.enable_profile_key option.
+    It's disabled by default if the authentication server does NOT send feature.enable_profile_key option.
 
     If the profile signing key isn't present, the player will be unable to join servers that enable enforce-secure-profile=true option.
-    And other players' Minecraft client will log a warning when receiving an unsigned chat message.
+    And other players' Minecraft client will log a warning message when receiving an unsigned chat message.
+
+-Dauthlibinjector.usernameCheck={default|enabled|disabled}
+    Whether to enable username validation. If disabled, Minecraft, BungeeCord and Paper will NOT perform username validation.
+    It's disabled by default if the authentication server does NOT send feature.usernameCheck option.
+    Turning on this option will prevent players whose username contains special characters from joining the server.
 
 -Dmultiyggdrasil.mojangYggdrasilService={default|enabled|disabled}
     Whether to enable ability to coexist with the Mojang authentication server.
@@ -127,6 +132,10 @@ Configure Minecraft server with the following JVM parameter:
     Some features that conflict with Mojang Yggdrasil server will no longer available anymore:
      - Mojang namespace
 
+-Dmultiyggdrasil.priorityVerifyingCustomName
+    Make the custom authentication server a priority to verify the player when logging into the game server
+    (The default is to give priority to verification of the genuine player).
+
 -Dmultiyggdrasil.namespace={namespace string}
     Set the namespace used by the feature "Mojang authentication server". Allowed characters are a-z0-9._- .
 
@@ -136,6 +145,16 @@ Configure Minecraft server with the following JVM parameter:
     authentication servers to play simultaneously.
     This feature can be disabled using this option.
 ```
+
+## License
+This work is licensed under the [GNU Affero General Public License v3.0](https://github.com/YuxuanZuo/MultiYggdrasil/blob/develop/LICENSE) or later, with the "MULTIYGGDRASIL" exception.
+
+> **"MULTIYGGDRASIL" EXCEPTION TO THE AGPL**
+>
+> As a special exception, using this work in the following ways does not cause your program to be covered by the AGPL:
+> 1. Bundling the unaltered binary form of this work in your program without statically or dynamically linking to it; or
+> 2. Interacting with this work through the provided inter-process communication interface, such as the HTTP API; or
+> 3. Loading this work as a Java Agent into a Java Virtual Machine.
 
 ## Credits
 * [authlib-injector](https://github.com/yushijinhun/authlib-injector) by [Haowei Wen](https://github.com/yushijinhun)  

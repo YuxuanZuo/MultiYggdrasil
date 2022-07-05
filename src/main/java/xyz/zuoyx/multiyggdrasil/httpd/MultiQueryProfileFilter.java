@@ -20,7 +20,6 @@ import static java.util.Optional.empty;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.CONTENT_TYPE_JSON;
 import static xyz.zuoyx.multiyggdrasil.util.UUIDUtils.fromUnsignedUUID;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,7 +54,7 @@ public class MultiQueryProfileFilter implements URLFilter {
 	}
 
 	@Override
-	public Optional<Response> handle(String domain, String path, IHTTPSession session) throws IOException {
+	public Optional<Response> handle(String domain, String path, IHTTPSession session) {
 		if (!domain.equals("sessionserver.mojang.com"))
 			return empty();
 		Matcher matcher = PATH_REGEX.matcher(path);
