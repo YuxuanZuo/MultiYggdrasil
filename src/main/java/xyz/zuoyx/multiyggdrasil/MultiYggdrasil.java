@@ -243,7 +243,19 @@ public final class MultiYggdrasil {
 		if (Config.mojangYggdrasilService.isEnabled(mojangYggdrasilServiceDefault)) {
 			log(INFO, "Mojang Yggdrasil service is enabled, Mojang namespace will be disabled!");
 			String namespace = getNamespace(config);
-			filters.add(new MultiHasJoinedServerFilter(mojangClient, customClient, namespace));
+
+			YggdrasilClient[] clients;
+			if (Config.priorityVerifyingCustomName) {
+				clients = new YggdrasilClient[]{customClient, mojangClient};
+			} else {
+				clients = new YggdrasilClient[]{mojangClient, customClient};
+			}
+
+			if (Config.noNamespaceSuffix) {
+				filters.add(new MultiHasJoinedServerFilter(clients));
+			} else {
+				filters.add(new MultiHasJoinedServerFilter(clients, namespace));
+			}
 			filters.add(new MultiQueryUUIDsFilter(mojangClient, customClient, namespace));
 			filters.add(new MultiQueryProfileFilter(mojangClient, customClient, namespace));
 		} else {

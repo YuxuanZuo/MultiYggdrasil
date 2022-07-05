@@ -51,6 +51,7 @@ public final class Config {
 	public static boolean httpdDisabled;
 	public static boolean noShowServerName;
 	public static boolean noLogFile;
+	public static boolean priorityVerifyingCustomName;
 	public static boolean noNamespaceSuffix;
 	public static int httpdPort;
 	public static String namespace;
@@ -164,6 +165,7 @@ public final class Config {
 		httpdDisabled = System.getProperty("authlibinjector.disableHttpd") != null;
 		noShowServerName = System.getProperty("authlibinjector.noShowServerName") != null;
 		noLogFile = System.getProperty("authlibinjector.noLogFile") != null;
+		priorityVerifyingCustomName = System.getProperty("multiyggdrasil.priorityVerifyingCustomName") != null;
 		noNamespaceSuffix = System.getProperty("multiyggdrasil.noNamespaceSuffix") != null;
 		httpdPort = Integer.getInteger("authlibinjector.httpdPort", 0);
 		namespace = System.getProperty("multiyggdrasil.namespace");
