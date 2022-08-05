@@ -69,6 +69,7 @@ import xyz.zuoyx.multiyggdrasil.transform.support.PaperUsernameCheckTransformer;
 import xyz.zuoyx.multiyggdrasil.transform.support.ProxyParameterWorkaround;
 import xyz.zuoyx.multiyggdrasil.transform.support.SkinWhitelistTransformUnit;
 import xyz.zuoyx.multiyggdrasil.transform.support.UsernameCharacterCheckTransformer;
+import xyz.zuoyx.multiyggdrasil.transform.support.VelocityProfileKeyTransformUnit;
 import xyz.zuoyx.multiyggdrasil.transform.support.YggdrasilKeyTransformUnit;
 import xyz.zuoyx.multiyggdrasil.transform.support.HasJoinedServerTransformer;
 import xyz.zuoyx.multiyggdrasil.transform.support.HasJoinedServerResponseTransformer;
@@ -318,6 +319,7 @@ public final class MultiYggdrasil {
 
 		transformer.units.add(new YggdrasilKeyTransformUnit());
 		config.getDecodedPublickey().ifPresent(YggdrasilKeyTransformUnit.PUBLIC_KEYS::add);
+		transformer.units.add(new VelocityProfileKeyTransformUnit());
 
 		return transformer;
 	}
