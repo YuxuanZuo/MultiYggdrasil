@@ -25,7 +25,7 @@ public class NamespacedID {
 
     public static final char NAMESPACE_SEPARATOR = '.';
     public static final String MOJANG_NAMESPACE = "mojang";
-    public static final String UNKNOWN_NAMESPACE = "custom";
+    public static final String UNKNOWN_NAMESPACE = "cust";
 
     private static final Pattern VALID_NAMESPACE = Pattern.compile("[a-z0-9_-]+");
 
