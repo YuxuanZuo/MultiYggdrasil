@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022  Haowei Wen <yushijinhun@gmail.com> and contributors
+ * Copyright (C) 2023  Haowei Wen <yushijinhun@gmail.com> and contributors
  * Copyright (C) 2022  Ethan Zuo <yuxuan.zuo@outlook.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -49,6 +49,7 @@ import java.util.stream.Stream;
 import xyz.zuoyx.multiyggdrasil.httpd.DefaultURLRedirector;
 import xyz.zuoyx.multiyggdrasil.httpd.LegacySkinAPIFilter;
 import xyz.zuoyx.multiyggdrasil.httpd.ProfileKeyFilter;
+import xyz.zuoyx.multiyggdrasil.httpd.PublickeysFilter;
 import xyz.zuoyx.multiyggdrasil.httpd.AntiFeaturesFilter;
 import xyz.zuoyx.multiyggdrasil.httpd.MultiHasJoinedServerFilter;
 import xyz.zuoyx.multiyggdrasil.httpd.MultiQueryProfileFilter;
@@ -283,6 +284,8 @@ public final class MultiYggdrasil {
 		if (!Config.profileKey.isEnabled(profileKeyDefault)) {
 			filters.add(new ProfileKeyFilter());
 		}
+
+		filters.add(new PublickeysFilter());
 
 		return filters;
 	}
