@@ -59,6 +59,7 @@ import xyz.zuoyx.multiyggdrasil.httpd.URLFilter;
 import xyz.zuoyx.multiyggdrasil.httpd.URLProcessor;
 import xyz.zuoyx.multiyggdrasil.transform.ClassTransformer;
 import xyz.zuoyx.multiyggdrasil.transform.DumpClassListener;
+import xyz.zuoyx.multiyggdrasil.transform.support.AccountTypeTransformer;
 import xyz.zuoyx.multiyggdrasil.transform.support.AuthServerNameInjector;
 import xyz.zuoyx.multiyggdrasil.transform.support.AuthlibLogInterceptor;
 import xyz.zuoyx.multiyggdrasil.transform.support.BungeeCordAllowedCharactersTransformer;
@@ -322,6 +323,7 @@ public final class MultiYggdrasil {
 		config.getDecodedPublickey().ifPresent(YggdrasilKeyTransformUnit.PUBLIC_KEYS::add);
 		transformer.units.add(new VelocityProfileKeyTransformUnit());
 		transformer.units.add(new BungeeCordProfileKeyTransformUnit());
+		MainArgumentsTransformer.getArgumentsListeners().add(new AccountTypeTransformer()::transform);
 
 		return transformer;
 	}
