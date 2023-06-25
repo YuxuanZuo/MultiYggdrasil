@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022  Haowei Wen <yushijinhun@gmail.com> and contributors
+ * Copyright (C) 2023  Haowei Wen <yushijinhun@gmail.com> and contributors
  * Copyright (C) 2022  Ethan Zuo <yuxuan.zuo@outlook.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -49,6 +49,7 @@ import java.util.stream.Stream;
 import xyz.zuoyx.multiyggdrasil.httpd.DefaultURLRedirector;
 import xyz.zuoyx.multiyggdrasil.httpd.LegacySkinAPIFilter;
 import xyz.zuoyx.multiyggdrasil.httpd.ProfileKeyFilter;
+import xyz.zuoyx.multiyggdrasil.httpd.PublickeysFilter;
 import xyz.zuoyx.multiyggdrasil.httpd.AntiFeaturesFilter;
 import xyz.zuoyx.multiyggdrasil.httpd.MultiHasJoinedServerFilter;
 import xyz.zuoyx.multiyggdrasil.httpd.MultiQueryProfileFilter;
@@ -59,6 +60,7 @@ import xyz.zuoyx.multiyggdrasil.httpd.URLFilter;
 import xyz.zuoyx.multiyggdrasil.httpd.URLProcessor;
 import xyz.zuoyx.multiyggdrasil.transform.ClassTransformer;
 import xyz.zuoyx.multiyggdrasil.transform.DumpClassListener;
+import xyz.zuoyx.multiyggdrasil.transform.support.AccountTypeTransformer;
 import xyz.zuoyx.multiyggdrasil.transform.support.AuthServerNameInjector;
 import xyz.zuoyx.multiyggdrasil.transform.support.AuthlibLogInterceptor;
 import xyz.zuoyx.multiyggdrasil.transform.support.BungeeCordAllowedCharactersTransformer;
@@ -283,6 +285,8 @@ public final class MultiYggdrasil {
 			filters.add(new ProfileKeyFilter());
 		}
 
+		filters.add(new PublickeysFilter());
+
 		return filters;
 	}
 
@@ -322,6 +326,7 @@ public final class MultiYggdrasil {
 		config.getDecodedPublickey().ifPresent(YggdrasilKeyTransformUnit.PUBLIC_KEYS::add);
 		transformer.units.add(new VelocityProfileKeyTransformUnit());
 		transformer.units.add(new BungeeCordProfileKeyTransformUnit());
+		MainArgumentsTransformer.getArgumentsListeners().add(new AccountTypeTransformer()::transform);
 
 		return transformer;
 	}

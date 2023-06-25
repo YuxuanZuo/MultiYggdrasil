@@ -25,9 +25,9 @@ public class NamespacedID {
 
     public static final char NAMESPACE_SEPARATOR = '.';
     public static final String MOJANG_NAMESPACE = "mojang";
-    public static final String UNKNOWN_NAMESPACE = "custom";
+    public static final String UNKNOWN_NAMESPACE = "cust";
 
-    private static final Pattern VALID_NAMESPACE = Pattern.compile("[a-z0-9._-]+");
+    private static final Pattern VALID_NAMESPACE = Pattern.compile("[a-z0-9_-]+");
 
     private final String id;
     private final String namespace;
@@ -43,7 +43,7 @@ public class NamespacedID {
         if (isNamespaceValid(namespace)) {
             this.namespace = namespace;
         } else {
-            log(ERROR, "Invalid namespace " + namespace + ". Allowed characters are [a-z0-9._-]");
+            log(ERROR, "Invalid namespace " + namespace + ". Allowed characters are [a-z0-9_-]");
             this.namespace = UNKNOWN_NAMESPACE;
         }
 
