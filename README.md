@@ -82,6 +82,7 @@ gradle
 -Dauthlibinjector.disableHttpd
     禁用内建的 HTTP 服务器.
     以下依赖内建 HTTP 服务器的功能将不可用:
+     - Mojang 验证服务器
      - Mojang 命名空间
      - 旧式皮肤 API polyfill
 
@@ -156,4 +157,3 @@ gradle
 这是本项目的基础, 它使得我们的想法成为可能.
  * [Gson](https://github.com/google/gson) by Google Inc.
  * [ASM](https://asm.ow2.io) by INRIA, France Telecom
- * [NanoHttpd](https://github.com/NanoHttpd/nanohttpd)

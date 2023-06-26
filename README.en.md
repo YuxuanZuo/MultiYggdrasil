@@ -74,6 +74,7 @@ Configure Minecraft server with the following JVM parameter:
 -Dauthlibinjector.disableHttpd
     Disable local HTTP server.
     Features (see below) depending on local HTTP server will be unavailable:
+     - Mojang Yggdrasil server
      - Mojang namespace
      - Legacy skin API polyfill
 
@@ -158,4 +159,3 @@ This work is licensed under the [GNU Affero General Public License v3.0](https:/
 This is the base of this project, which makes our ideas possible.
 * [Gson](https://github.com/google/gson) by Google Inc.
 * [ASM](https://asm.ow2.io) by INRIA, France Telecom
-* [NanoHttpd](https://github.com/NanoHttpd/nanohttpd)
