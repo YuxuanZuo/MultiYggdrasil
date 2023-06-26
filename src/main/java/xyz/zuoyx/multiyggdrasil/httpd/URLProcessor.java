@@ -17,6 +17,8 @@
 package xyz.zuoyx.multiyggdrasil.httpd;
 
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.CONTENT_TYPE_TEXT;
+import static xyz.zuoyx.multiyggdrasil.util.IOUtils.asBytes;
+import static xyz.zuoyx.multiyggdrasil.util.IOUtils.sendResponse;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.transfer;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.log;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.Level.DEBUG;
@@ -26,7 +28,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -35,14 +39,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 import xyz.zuoyx.multiyggdrasil.Config;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.IHTTPSession;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.IStatus;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.NanoHTTPD;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Response;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Status;
 
 public class URLProcessor {
 
@@ -104,50 +107,54 @@ public class URLProcessor {
 	}
 
 	private DebugApiEndpoint debugApi = new DebugApiEndpoint();
-	private volatile NanoHTTPD httpd;
-	private final Object httpdLock = new Object();
+	private volatile HttpServer httpServer;
+	private final Object httpServerLock = new Object();
 
 	private int getLocalApiPort() {
-		synchronized (httpdLock) {
-			if (httpd == null) {
-				httpd = createHttpd();
+		synchronized (httpServerLock) {
+			if (httpServer == null) {
 				try {
-					httpd.start();
+					httpServer = createHttpServer();
 				} catch (IOException e) {
-					throw new IllegalStateException("Httpd failed to start");
+					throw new IllegalStateException("HTTP server failed to create");
 				}
-				log(INFO, "Httpd is running on port " + httpd.getListeningPort());
+				httpServer.setExecutor(Executors.newCachedThreadPool());
+				httpServer.start();
+				log(INFO, "HTTP server is running on port " + httpServer.getAddress().getPort());
 			}
-			return httpd.getListeningPort();
+			return httpServer.getAddress().getPort();
 		}
 	}
 
-	private NanoHTTPD createHttpd() {
-		return new NanoHTTPD("127.0.0.1", Config.httpdPort) {
+	private HttpServer createHttpServer() throws IOException {
+		HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", Config.httpdPort), 0);
+		server.createContext("/", new HttpHandler() {
 			@Override
-			public Response serve(IHTTPSession session) {
-				if (session.getUri().startsWith("/debug/")) {
-					return debugApi.serve(session);
+			public void handle(HttpExchange exchange) throws IOException {
+				if (exchange.getRequestURI().getPath().startsWith("/debug/")) {
+					debugApi.serve(exchange);
+					return;
 				}
 
-				Matcher matcher = LOCAL_URL_REGEX.matcher(session.getUri());
+				Matcher matcher = LOCAL_URL_REGEX.matcher(exchange.getRequestURI().getPath());
 				if (matcher.find()) {
 					String protocol = matcher.group("protocol");
 					String domain = matcher.group("domain");
 					String path = matcher.group("path");
 					for (URLFilter filter : filters) {
 						if (filter.canHandle(domain)) {
-							Optional<Response> result;
+							boolean result;
 							try {
-								result = filter.handle(domain, path, session);
+								result = filter.handle(domain, path, exchange);
 							} catch (Throwable e) {
-								log(WARNING, "An error occurred while processing request [" + session.getUri() + "]", e);
-								return Response.newFixedLength(Status.INTERNAL_ERROR, CONTENT_TYPE_TEXT, "Internal Server Error");
+								log(WARNING, "An error occurred while processing request [" + exchange.getRequestURI().getPath() + "]", e);
+								sendResponse(exchange, 500, CONTENT_TYPE_TEXT, "Internal Server Error".getBytes());
+								return;
 							}
 
-							if (result.isPresent()) {
-								log(DEBUG, "Request to [" + session.getUri() + "] is handled by [" + filter + "]");
-								return result.get();
+							if (result) {
+								log(DEBUG, "Request to [" + exchange.getRequestURI().getPath() + "] is handled by [" + filter + "]");
+								return;
 							}
 						}
 					}
@@ -155,40 +162,44 @@ public class URLProcessor {
 					String target = redirector.redirect(domain, path)
 							.orElseGet(() -> protocol + "://" + domain + path);
 					try {
-						return reverseProxy(session, target);
-					} catch (IOException e) {
+						reverseProxy(exchange, target);
+					} catch (URISyntaxException | IOException e) {
 						log(WARNING, "Reverse proxy error", e);
-						return Response.newFixedLength(Status.BAD_GATEWAY, CONTENT_TYPE_TEXT, "Bad Gateway");
+						sendResponse(exchange, 502, CONTENT_TYPE_TEXT, "Bad Gateway".getBytes());
 					}
 				} else {
-					log(DEBUG, "No handler is found for [" + session.getUri() + "]");
-					return Response.newFixedLength(Status.NOT_FOUND, CONTENT_TYPE_TEXT, "Not Found");
+					log(DEBUG, "No handler is found for [" + exchange.getRequestURI().getPath() + "]");
+					sendResponse(exchange, 404, CONTENT_TYPE_TEXT, "Not Found".getBytes());
 				}
 			}
-		};
+		});
+		return server;
 	}
 
 	private static final Set<String> ignoredHeaders = new HashSet<>(Arrays.asList("host", "expect", "connection", "keep-alive", "transfer-encoding"));
 
-	@SuppressWarnings("resource")
-	private Response reverseProxy(IHTTPSession session, String upstream) throws IOException {
-		String method = session.getMethod();
+	private void reverseProxy(HttpExchange exchange, String upstream) throws URISyntaxException, IOException {
+		String method = exchange.getRequestMethod();
 
-		String url = session.getQueryParameterString() == null ? upstream : upstream + "?" + session.getQueryParameterString();
+		String rawQuery = exchange.getRequestURI().getRawQuery();
+		String url = rawQuery == null ? upstream : upstream + "?" + rawQuery;
 
-		Map<String, String> requestHeaders = new LinkedHashMap<>(session.getHeaders());
+		Map<String, List<String>> requestHeaders = new LinkedHashMap<>(exchange.getRequestHeaders());
 		ignoredHeaders.forEach(requestHeaders::remove);
 
-		InputStream clientIn = session.getInputStream();
+		InputStream clientIn = exchange.getRequestBody();
 
 		log(DEBUG, "Reverse proxy: > " + method + " " + url + ", headers: " + requestHeaders);
 
-		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+		HttpURLConnection conn = (HttpURLConnection) new URI(url).toURL().openConnection();
 		conn.setRequestMethod(method);
-		conn.setDoOutput(clientIn != null);
-		requestHeaders.forEach(conn::setRequestProperty);
+		conn.setDoOutput(clientIn.available() != 0);
+		requestHeaders.forEach((key, values) -> {
+			String value = String.join(",", values);
+			conn.setRequestProperty(key, value);
+		});
 
-		if (clientIn != null) {
+		if (clientIn.available() != 0) {
 			try (OutputStream upstreamOut = conn.getOutputStream()) {
 				transfer(clientIn, upstreamOut);
 			}
@@ -210,18 +221,7 @@ public class URLProcessor {
 		}
 		log(DEBUG, "Reverse proxy: < " + responseCode + " " + reponseMessage + " , headers: " + responseHeaders);
 
-		IStatus status = new IStatus() {
-			@Override
-			public int getRequestStatus() {
-				return responseCode;
-			}
-
-			@Override
-			public String getDescription() {
-				return responseCode + " " + reponseMessage;
-			}
-		};
-
+		// no content
 		long contentLength = -1;
 		for (Entry<String, List<String>> header : responseHeaders.entrySet()) {
 			if ("content-length".equalsIgnoreCase(header.getKey())) {
@@ -230,19 +230,12 @@ public class URLProcessor {
 			}
 		}
 
-		Response response;
-		if (contentLength == -1) {
-			if (conn.getHeaderField("transfer-encoding") == null) {
-				// no content
-				response = Response.newFixedLength(status, null, upstreamIn, 0);
-			} else {
-				response = Response.newChunked(status, null, upstreamIn);
-			}
-		} else {
-			response = Response.newFixedLength(status, null, upstreamIn, contentLength);
+		if (contentLength == -1 && conn.getHeaderField("transfer-encoding") != null) {
+			// chunked encoding
+			contentLength = 0;
 		}
-		responseHeaders.forEach((name, values) -> values.forEach(value -> response.addHeader(name, value)));
+		responseHeaders.forEach((name, values) -> values.forEach(value -> exchange.getResponseHeaders().add(name, value)));
 
-		return response;
+		sendResponse(exchange, responseCode, null, asBytes(upstreamIn), contentLength);
 	}
 }

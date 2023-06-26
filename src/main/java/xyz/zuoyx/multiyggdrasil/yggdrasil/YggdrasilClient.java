@@ -30,6 +30,7 @@ import static xyz.zuoyx.multiyggdrasil.util.UUIDUtils.fromUnsignedUUID;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.Proxy;
+import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -60,6 +61,8 @@ public class YggdrasilClient {
 			responseText = asString(http("POST", apiProvider.queryUUIDsByNames(),
 					JsonUtils.toJsonString(names).getBytes(UTF_8), CONTENT_TYPE_JSON,
 					proxy));
+		} catch (URISyntaxException e) {
+			throw new IllegalArgumentException("Invalid URL '" + apiProvider.queryUUIDsByNames() + "'");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -87,6 +90,8 @@ public class YggdrasilClient {
 		String responseText;
 		try {
 			responseText = asString(http("GET", url, proxy));
+		} catch (URISyntaxException e) {
+			throw new IllegalArgumentException("Invalid URL '" + url + "'");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -103,6 +108,8 @@ public class YggdrasilClient {
 		String responseText;
 		try {
 			responseText = asString(http("GET", apiProvider.hasJoinedServer(username, serverId, ip) , proxy));
+		} catch (URISyntaxException e) {
+			throw new IllegalArgumentException("Invalid URL '" + apiProvider.hasJoinedServer(username, serverId, ip) + "'");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

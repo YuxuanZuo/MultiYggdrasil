@@ -17,12 +17,12 @@
 package xyz.zuoyx.multiyggdrasil.httpd;
 
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.CONTENT_TYPE_JSON;
+import static xyz.zuoyx.multiyggdrasil.util.IOUtils.sendResponse;
 import static xyz.zuoyx.multiyggdrasil.util.JsonUtils.toJsonString;
+import java.io.IOException;
+import com.sun.net.httpserver.HttpExchange;
 import com.google.gson.JsonObject;
 import xyz.zuoyx.multiyggdrasil.MultiYggdrasil;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.IHTTPSession;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Response;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Status;
 import xyz.zuoyx.multiyggdrasil.transform.PerformanceMetrics;
 
 /**
@@ -30,8 +30,8 @@ import xyz.zuoyx.multiyggdrasil.transform.PerformanceMetrics;
  */
 public class DebugApiEndpoint {
 
-	public Response serve(IHTTPSession session) {
-		if (session.getUri().equals("/debug/metrics") && session.getMethod().equals("GET")) {
+	public void serve(HttpExchange exchange) throws IOException {
+		if (exchange.getRequestURI().getPath().equals("/debug/metrics") && exchange.getRequestMethod().equals("GET")) {
 			PerformanceMetrics metrics = MultiYggdrasil.getClassTransformer().performanceMetrics;
 			JsonObject response = new JsonObject();
 			response.addProperty("totalTime", metrics.getTotalTime());
@@ -40,9 +40,9 @@ public class DebugApiEndpoint {
 			response.addProperty("analysisTime", metrics.getAnalysisTime());
 			response.addProperty("classesScanned", metrics.getClassesScanned());
 			response.addProperty("classesSkipped", metrics.getClassesSkipped());
-			return Response.newFixedLength(Status.OK, CONTENT_TYPE_JSON, toJsonString(response));
+			sendResponse(exchange, 200, CONTENT_TYPE_JSON, toJsonString(response).getBytes());
 		} else {
-			return Response.newFixedLength(Status.NOT_FOUND, null, null);
+			sendResponse(exchange, 404, null, null);
 		}
 	}
 }

@@ -17,17 +17,17 @@
 package xyz.zuoyx.multiyggdrasil.httpd;
 
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.CONTENT_TYPE_JSON;
+import static xyz.zuoyx.multiyggdrasil.util.IOUtils.parseQueryParams;
+import static xyz.zuoyx.multiyggdrasil.util.IOUtils.sendResponse;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.Level.ERROR;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.log;
 
+import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.IHTTPSession;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Response;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Status;
+import com.sun.net.httpserver.HttpExchange;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.GameProfile;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.NamespacedID;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.YggdrasilAPIProvider;
@@ -55,12 +55,9 @@ public class MultiHasJoinedServerFilter implements URLFilter {
     }
 
     @Override
-    public Optional<Response> handle(String domain, String path, IHTTPSession session) {
-        if (domain.equals("sessionserver.mojang.com") && path.equals("/session/minecraft/hasJoined") && session.getMethod().equals("GET")) {
-            Map<String, String> params = new LinkedHashMap<>();
-            session.getParameters().forEach(
-                    (key ,value) -> params.put(key, value.get(0))
-            );
+    public boolean handle(String domain, String path, HttpExchange exchange) throws IOException {
+        if (domain.equals("sessionserver.mojang.com") && path.equals("/session/minecraft/hasJoined") && exchange.getRequestMethod().equals("GET")) {
+            Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
 
             Optional<GameProfile> response = Optional.empty();
             for (YggdrasilClient client : clients) {
@@ -81,12 +78,13 @@ public class MultiHasJoinedServerFilter implements URLFilter {
             }
 
             if (response.isPresent()) {
-                return Optional.of(Response.newFixedLength(Status.OK, CONTENT_TYPE_JSON, YggdrasilResponseBuilder.hasJoinedServer(response.get())));
+                sendResponse(exchange, 200, CONTENT_TYPE_JSON, YggdrasilResponseBuilder.hasJoinedServer(response.get()).getBytes());
             } else {
-                return Optional.of(Response.newFixedLength(Status.NO_CONTENT, null, null));
+                sendResponse(exchange, 204, null, null);
             }
+            return true;
         } else {
-            return Optional.empty();
+            return false;
         }
     }
 }

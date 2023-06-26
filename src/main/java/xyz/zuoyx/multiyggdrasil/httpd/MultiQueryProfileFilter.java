@@ -16,19 +16,18 @@
  */
 package xyz.zuoyx.multiyggdrasil.httpd;
 
-import static java.util.Optional.empty;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.CONTENT_TYPE_JSON;
+import static xyz.zuoyx.multiyggdrasil.util.IOUtils.parseQueryParams;
+import static xyz.zuoyx.multiyggdrasil.util.IOUtils.sendResponse;
 import static xyz.zuoyx.multiyggdrasil.util.UUIDUtils.fromUnsignedUUID;
 
-import java.util.List;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.IHTTPSession;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Response;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Status;
+import com.sun.net.httpserver.HttpExchange;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.GameProfile;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.NamespacedID;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.YggdrasilClient;
@@ -54,23 +53,24 @@ public class MultiQueryProfileFilter implements URLFilter {
 	}
 
 	@Override
-	public Optional<Response> handle(String domain, String path, IHTTPSession session) {
+	public boolean handle(String domain, String path, HttpExchange exchange) throws IOException {
 		if (!domain.equals("sessionserver.mojang.com"))
-			return empty();
+			return false;
 		Matcher matcher = PATH_REGEX.matcher(path);
 		if (!matcher.find())
-			return empty();
+			return false;
 
 		UUID uuid;
 		try {
 			uuid = fromUnsignedUUID(matcher.group("uuid"));
 		} catch (IllegalArgumentException e) {
-			return Optional.of(Response.newFixedLength(Status.NO_CONTENT, null, null));
+			sendResponse(exchange, 204, null, null);
+			return true;
 		}
 
 		boolean withSignature = false;
-		List<String> unsignedValues = session.getParameters().get("unsigned");
-		if (unsignedValues != null && unsignedValues.get(0).equals("false")) {
+		String unsignedValues = parseQueryParams(exchange.getRequestURI().getQuery()).get("unsigned");
+		if (unsignedValues != null && unsignedValues.equals("false")) {
 			withSignature = true;
 		}
 
@@ -83,10 +83,11 @@ public class MultiQueryProfileFilter implements URLFilter {
 		}
 
 		if (response.isPresent()) {
-			return Optional.of(Response.newFixedLength(Status.OK, CONTENT_TYPE_JSON, YggdrasilResponseBuilder.queryProfile(response.get(), withSignature)));
+			sendResponse(exchange, 200, CONTENT_TYPE_JSON, YggdrasilResponseBuilder.queryProfile(response.get(), withSignature).getBytes());
 		} else {
-			return Optional.of(Response.newFixedLength(Status.NO_CONTENT, null, null));
+			sendResponse(exchange, 204, null, null);
 		}
+		return true;
 	}
 
 }

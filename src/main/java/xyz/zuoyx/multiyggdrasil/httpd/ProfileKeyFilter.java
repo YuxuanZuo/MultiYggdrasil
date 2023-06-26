@@ -18,7 +18,9 @@ package xyz.zuoyx.multiyggdrasil.httpd;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.CONTENT_TYPE_JSON;
+import static xyz.zuoyx.multiyggdrasil.util.IOUtils.sendResponse;
 import static xyz.zuoyx.multiyggdrasil.util.JsonUtils.toJsonString;
+import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -26,11 +28,8 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
-import java.util.Optional;
+import com.sun.net.httpserver.HttpExchange;
 import com.google.gson.JsonObject;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.IHTTPSession;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Response;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Status;
 
 /**
  * Intercepts Minecraft's request to <a href="https://api.minecraftservices.com/player/certificates">...</a>,
@@ -44,11 +43,12 @@ public class ProfileKeyFilter implements URLFilter {
 	}
 
 	@Override
-	public Optional<Response> handle(String domain, String path, IHTTPSession session) {
-		if (domain.equals("api.minecraftservices.com") && path.equals("/player/certificates") && session.getMethod().equals("POST")) {
-			return Optional.of(Response.newFixedLength(Status.OK, CONTENT_TYPE_JSON, toJsonString(makeDummyResponse())));
+	public boolean handle(String domain, String path, HttpExchange exchange) throws IOException {
+		if (domain.equals("api.minecraftservices.com") && path.equals("/player/certificates") && exchange.getRequestMethod().equals("POST")) {
+			sendResponse(exchange, 200, CONTENT_TYPE_JSON, toJsonString(makeDummyResponse()).getBytes());
+			return true;
 		}
-		return Optional.empty();
+		return false;
 	}
 
 	private JsonObject makeDummyResponse() {

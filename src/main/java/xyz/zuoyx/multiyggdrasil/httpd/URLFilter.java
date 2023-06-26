@@ -17,10 +17,8 @@
 package xyz.zuoyx.multiyggdrasil.httpd;
 
 import java.io.IOException;
-import java.util.Optional;
 
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.IHTTPSession;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Response;
+import com.sun.net.httpserver.HttpExchange;
 
 /**
  * A URLFilter filters the URLs in the bytecode, and intercepts those it is interested in.
@@ -37,5 +35,5 @@ public interface URLFilter {
 	 */
 	boolean canHandle(String domain);
 
-	Optional<Response> handle(String domain, String path, IHTTPSession session) throws IOException;
+	boolean handle(String domain, String path, HttpExchange exchange) throws IOException;
 }

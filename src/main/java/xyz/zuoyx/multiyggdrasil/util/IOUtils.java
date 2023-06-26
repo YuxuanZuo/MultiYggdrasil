@@ -24,26 +24,31 @@ import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import com.sun.net.httpserver.HttpExchange;
 
 public final class IOUtils {
 
 	public static final String CONTENT_TYPE_JSON = "application/json; charset=utf-8";
 	public static final String CONTENT_TYPE_TEXT = "text/plain; charset=utf-8";
+	public static final String CONTENT_TYPE_IMAGE = "image/png";
 
-	private static HttpURLConnection createConnection(String url, Proxy proxy) throws IOException {
+	private static HttpURLConnection createConnection(String url, Proxy proxy) throws URISyntaxException, IOException {
 		if (proxy == null) {
-			return (HttpURLConnection) new URL(url).openConnection();
+			return (HttpURLConnection) new URI(url).toURL().openConnection();
 		} else {
-			return (HttpURLConnection) new URL(url).openConnection(proxy);
+			return (HttpURLConnection) new URI(url).toURL().openConnection(proxy);
 		}
 	}
 
-	public static byte[] http(String method, String url) throws IOException {
+	public static byte[] http(String method, String url) throws URISyntaxException, IOException {
 		return http(method, url, null);
 	}
 
-	public static byte[] http(String method, String url, Proxy proxy) throws IOException {
+	public static byte[] http(String method, String url, Proxy proxy) throws URISyntaxException, IOException {
 		HttpURLConnection conn = createConnection(url, proxy);
 		conn.setRequestMethod(method);
 		try (InputStream in = conn.getInputStream()) {
@@ -51,11 +56,11 @@ public final class IOUtils {
 		}
 	}
 
-	public static byte[] http(String method, String url, byte[] payload, String contentType) throws IOException {
+	public static byte[] http(String method, String url, byte[] payload, String contentType) throws URISyntaxException, IOException {
 		return http(method, url, payload, contentType, null);
 	}
 
-	public static byte[] http(String method, String url, byte[] payload, String contentType, Proxy proxy) throws IOException {
+	public static byte[] http(String method, String url, byte[] payload, String contentType, Proxy proxy) throws URISyntaxException, IOException {
 		HttpURLConnection conn = createConnection(url, proxy);
 		conn.setRequestMethod(method);
 		conn.setDoOutput(true);
@@ -66,6 +71,44 @@ public final class IOUtils {
 		try (InputStream in = conn.getInputStream()) {
 			return asBytes(in);
 		}
+	}
+
+	public static void sendResponse(HttpExchange exchange, int status, String mimeType, byte[] data) throws IOException {
+		if (data != null) {
+			sendResponse(exchange, status, mimeType, data, data.length);
+		} else {
+			exchange.sendResponseHeaders(status, -1);
+		}
+	}
+
+	public static void sendResponse(HttpExchange exchange, int status, String mimeType, byte[] data, long length) throws IOException {
+		if (mimeType != null) {
+			exchange.getResponseHeaders().set("Content-Type", mimeType);
+		}
+		exchange.sendResponseHeaders(status, length);
+		if (length != -1) {
+			OutputStream os = exchange.getResponseBody();
+			os.write(data);
+			os.close();
+		}
+	}
+
+	public static Map<String, String> parseQueryParams(String query) {
+		Map<String, String> queryParams = new LinkedHashMap<>();
+
+		if (query != null) {
+			String[] params = query.split("&");
+			for (String param : params) {
+				String[] keyValue = param.split("=");
+				if (keyValue.length == 2) {
+					String key = keyValue[0];
+					String value = keyValue[1];
+					queryParams.put(key, value);
+				}
+			}
+		}
+
+		return queryParams;
 	}
 
 	public static byte[] asBytes(InputStream in) throws IOException {

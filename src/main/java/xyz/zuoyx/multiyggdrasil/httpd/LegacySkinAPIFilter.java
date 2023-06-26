@@ -17,28 +17,26 @@
 package xyz.zuoyx.multiyggdrasil.httpd;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static xyz.zuoyx.multiyggdrasil.util.IOUtils.CONTENT_TYPE_IMAGE;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.asString;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.http;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.newUncheckedIOException;
+import static xyz.zuoyx.multiyggdrasil.util.IOUtils.sendResponse;
 import static xyz.zuoyx.multiyggdrasil.util.JsonUtils.parseJson;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.log;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.Level.DEBUG;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.Level.INFO;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URISyntaxException;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.IHTTPSession;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Response;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Status;
+import com.sun.net.httpserver.HttpExchange;
 import xyz.zuoyx.multiyggdrasil.util.JsonUtils;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.YggdrasilClient;
 
@@ -58,12 +56,12 @@ public class LegacySkinAPIFilter implements URLFilter {
 	}
 
 	@Override
-	public Optional<Response> handle(String domain, String path, IHTTPSession session) {
+	public boolean handle(String domain, String path, HttpExchange exchange) throws IOException {
 		if (!domain.equals("skins.minecraft.net"))
-			return empty();
+			return false;
 		Matcher matcher = PATH_SKINS.matcher(path);
 		if (!matcher.find())
-			return empty();
+			return false;
 		String username = matcher.group("username");
 
 		// Minecraft does not encode non-ASCII characters in URLs
@@ -87,16 +85,17 @@ public class LegacySkinAPIFilter implements URLFilter {
 			byte[] data;
 			try {
 				data = http("GET", url);
-			} catch (IOException e) {
+			} catch (URISyntaxException | IOException e) {
 				throw newUncheckedIOException("Failed to retrieve skin from " + url, e);
 			}
 			log(INFO, "Retrieved skin for " + username + " from " + url + ", " + data.length + " bytes");
-			return of(Response.newFixedLength(Status.OK, "image/png", new ByteArrayInputStream(data), data.length));
+			sendResponse(exchange, 200, CONTENT_TYPE_IMAGE, data);
 
 		} else {
 			log(INFO, "No skin is found for " + username);
-			return of(Response.newFixedLength(Status.NOT_FOUND, null, null));
+			sendResponse(exchange, 404, null, null);
 		}
+		return true;
 	}
 
 	private Optional<String> obtainTextureUrl(String texturesPayload, String textureType) throws UncheckedIOException {
