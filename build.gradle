@@ -1,6 +1,6 @@
 plugins {
-	id 'com.github.johnrengelman.shadow' version '7.1.2'
-	id 'com.palantir.git-version' version '0.15.0'
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
+	id 'com.palantir.git-version' version '3.0.0'
 	id 'java'
 }
 
@@ -9,16 +9,18 @@ repositories {
 }
 
 dependencies {
-	implementation 'com.google.code.gson:gson:2.9.0'
-	implementation 'org.ow2.asm:asm:9.3'
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+	implementation 'com.google.code.gson:gson:2.10.1'
+	implementation 'org.ow2.asm:asm:9.5'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
 }
 
 test {
 	useJUnitPlatform()
 }
 
-sourceCompatibility = 17
+compileJava {
+	options.release = 17
+}
 
 def buildNumber = System.getenv('AI_BUILD_NUMBER')
 def gitInfo = versionDetails()

@@ -3,7 +3,7 @@
 
 # MultiYggdrasil
 [![latest release](https://img.shields.io/github/v/tag/YuxuanZuo/MultiYggdrasil?color=yellow&include_prereleases&label=version&sort=semver&style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/releases)
-[![ci status](https://img.shields.io/github/workflow/status/YuxuanZuo/MultiYggdrasil/CI?style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/actions?query=workflow%3ACI)
+[![ci status](https://img.shields.io/github/actions/workflow/status/YuxuanZuo/MultiYggdrasil/ci.yml?branch=develop)](https://github.com/YuxuanZuo/MultiYggdrasil/actions?query=workflow%3ACI)
 [![license agpl-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg?style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/blob/develop/LICENSE)
 
 一个 [authlib-injector](https://github.com/yushijinhun/authlib-injector) 的分支, 添加了与 Mojang 验证服务器共存的支持.
