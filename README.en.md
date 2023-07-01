@@ -27,6 +27,9 @@ Configure Minecraft server with the following JVM parameter:
 ```
 -javaagent:{/path/to/MultiYggdrasil.jar}={Authentication Server URL}
 ```
+Note: Unless the custom authentication server supports Mojang authentication server coexistence, this feature will not 
+be enabled by default. You need to enable it by adding specific JVM parameters. Please refer to the [Options](README.en.md#options) 
+section for more details.
 
 ## Options
 ```
@@ -122,9 +125,9 @@ Configure Minecraft server with the following JVM parameter:
     In order to distinguish the username of players from the custom authentication server from that of the Mojang server,
     the player who from the custom authentication server will add a namespace suffix to their username.
     For example:
-      Notch.custom
+      Notch.cust
     If the option "-Dmultiyggdrasil.namespace" is not set and the field "namespace" is not sent by authentication
-    server, the server will issue a default namespace called "custom". If any fields were sent, the server will use the
+    server, the server will issue a default namespace called "cust". If any fields were sent, the server will use the
     namespace that you defined earlier.
     
     Some features that conflict with Mojang Yggdrasil server will no longer available anymore:
@@ -135,7 +138,7 @@ Configure Minecraft server with the following JVM parameter:
     (The default is to give priority to verification of the genuine player).
 
 -Dmultiyggdrasil.namespace={namespace string}
-    Set the namespace used by the feature "Mojang authentication server". Allowed characters are a-z0-9._- .
+    Set the namespace used by the feature "Mojang authentication server". Allowed characters are a-z0-9_- .
 
 -Dmultiyggdrasil.noNamespaceSuffix
     Do not add namespace suffix to the username.
