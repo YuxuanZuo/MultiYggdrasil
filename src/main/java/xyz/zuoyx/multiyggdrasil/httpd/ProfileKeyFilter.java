@@ -30,6 +30,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import com.sun.net.httpserver.HttpExchange;
 import com.google.gson.JsonObject;
+import xyz.zuoyx.multiyggdrasil.util.UnsupportedURLException;
 
 /**
  * Intercepts Minecraft's request to <a href="https://api.minecraftservices.com/player/certificates">...</a>,
@@ -43,12 +44,12 @@ public class ProfileKeyFilter implements URLFilter {
 	}
 
 	@Override
-	public boolean handle(String domain, String path, HttpExchange exchange) throws IOException {
+	public void handle(String domain, String path, HttpExchange exchange) throws UnsupportedURLException, IOException {
 		if (domain.equals("api.minecraftservices.com") && path.equals("/player/certificates") && exchange.getRequestMethod().equals("POST")) {
 			sendResponse(exchange, 200, CONTENT_TYPE_JSON, toJsonString(makeDummyResponse()).getBytes());
-			return true;
+		} else {
+			throw new UnsupportedURLException();
 		}
-		return false;
 	}
 
 	private JsonObject makeDummyResponse() {

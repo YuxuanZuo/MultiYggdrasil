@@ -158,7 +158,7 @@ public final class MultiYggdrasil {
 						try (InputStream in = connection.getInputStream()) {
 							while (in.read() != -1)
 								;
-						} catch (IOException e) {
+						} catch (IOException ignored) {
 						}
 
 						log(INFO, "Redirect to: " + absoluteAli);

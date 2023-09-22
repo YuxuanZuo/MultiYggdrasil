@@ -68,7 +68,7 @@ public class SkinWhitelistTransformUnit implements TransformUnit {
 		try {
 			domain = new URI(url).getHost();
 		} catch (URISyntaxException e) {
-			throw new IllegalArgumentException("Invalid URL '" + url + "'");
+			throw new IllegalArgumentException("Invalid URL [" + url + "]");
 		}
 
 		for (String pattern : DEFAULT_BLACKLISTED_DOMAINS) {

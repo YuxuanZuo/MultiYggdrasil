@@ -20,6 +20,7 @@ import static xyz.zuoyx.multiyggdrasil.util.IOUtils.CONTENT_TYPE_JSON;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.sendResponse;
 import java.io.IOException;
 import com.sun.net.httpserver.HttpExchange;
+import xyz.zuoyx.multiyggdrasil.util.UnsupportedURLException;
 
 /**
  * Disables Mojang's anti-features.
@@ -36,21 +37,17 @@ public class AntiFeaturesFilter implements URLFilter {
 	}
 
 	@Override
-	public boolean handle(String domain, String path, HttpExchange exchange) throws IOException {
+	public void handle(String domain, String path, HttpExchange exchange) throws UnsupportedURLException, IOException {
 		if (domain.equals("api.minecraftservices.com") && path.equals("/privileges") && exchange.getRequestMethod().equals("GET")) {
 			sendResponse(exchange, 200, CONTENT_TYPE_JSON, RESPONSE_PRIVILEGES.getBytes());
-			return true;
 		} else if (domain.equals("api.minecraftservices.com") && path.equals("/player/attributes") && exchange.getRequestMethod().equals("GET")) {
 			sendResponse(exchange, 200, CONTENT_TYPE_JSON, RESPONSE_PLAYER_ATTRIBUTES.getBytes());
-			return true;
 		} else if (domain.equals("api.minecraftservices.com") && path.equals("/privacy/blocklist") && exchange.getRequestMethod().equals("GET")) {
 			sendResponse(exchange, 200, CONTENT_TYPE_JSON, RESPONSE_PRIVACY_BLOCKLIST.getBytes());
-			return true;
 		} else if (domain.equals("sessionserver.mojang.com") && path.equals("/blockedservers") && exchange.getRequestMethod().equals("GET")) {
 			sendResponse(exchange, 404, null, null);
-			return true;
 		} else {
-			return false;
+			throw new UnsupportedURLException();
 		}
 	}
 }

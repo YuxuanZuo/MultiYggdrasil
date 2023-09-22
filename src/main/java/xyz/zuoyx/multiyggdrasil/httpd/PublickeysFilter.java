@@ -27,6 +27,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import xyz.zuoyx.multiyggdrasil.transform.support.YggdrasilKeyTransformUnit;
+import xyz.zuoyx.multiyggdrasil.util.UnsupportedURLException;
 
 public class PublickeysFilter implements URLFilter {
 
@@ -36,12 +37,12 @@ public class PublickeysFilter implements URLFilter {
 	}
 
 	@Override
-	public boolean handle(String domain, String path, HttpExchange exchange) throws IOException {
+	public void handle(String domain, String path, HttpExchange exchange) throws UnsupportedURLException, IOException {
 		if (domain.equals("api.minecraftservices.com") && path.equals("/publickeys") && exchange.getRequestMethod().equals("GET")) {
 			sendResponse(exchange, 200, CONTENT_TYPE_JSON, toJsonString(makePublickeysResponse()).getBytes());
-			return true;
+		} else {
+			throw new UnsupportedURLException();
 		}
-		return false;
 	}
 
 	private JsonObject makePublickeysResponse() {

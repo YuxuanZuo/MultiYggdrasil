@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.sun.net.httpserver.HttpExchange;
+import xyz.zuoyx.multiyggdrasil.util.UnsupportedURLException;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.GameProfile;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.NamespacedID;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.YggdrasilAPIProvider;
@@ -55,7 +56,7 @@ public class MultiHasJoinedServerFilter implements URLFilter {
     }
 
     @Override
-    public boolean handle(String domain, String path, HttpExchange exchange) throws IOException {
+    public void handle(String domain, String path, HttpExchange exchange) throws UnsupportedURLException, IOException {
         if (domain.equals("sessionserver.mojang.com") && path.equals("/session/minecraft/hasJoined") && exchange.getRequestMethod().equals("GET")) {
             Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
 
@@ -82,9 +83,8 @@ public class MultiHasJoinedServerFilter implements URLFilter {
             } else {
                 sendResponse(exchange, 204, null, null);
             }
-            return true;
         } else {
-            return false;
+            throw new UnsupportedURLException();
         }
     }
 }

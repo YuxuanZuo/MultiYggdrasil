@@ -62,9 +62,9 @@ public class YggdrasilClient {
 					JsonUtils.toJsonString(names).getBytes(UTF_8), CONTENT_TYPE_JSON,
 					proxy));
 		} catch (URISyntaxException e) {
-			throw new IllegalArgumentException("Invalid URL '" + apiProvider.queryUUIDsByNames() + "'");
+			throw new IllegalArgumentException("Invalid URL [" + apiProvider.queryUUIDsByNames() + "]");
 		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+			throw newUncheckedIOException("Failed to request URL [" + apiProvider.queryUUIDsByNames() + "]", e);
 		}
 		log(DEBUG, "Query UUIDs of " + names + " at [" + apiProvider + "], response: " + responseText);
 
@@ -91,9 +91,9 @@ public class YggdrasilClient {
 		try {
 			responseText = asString(http("GET", url, proxy));
 		} catch (URISyntaxException e) {
-			throw new IllegalArgumentException("Invalid URL '" + url + "'");
+			throw new IllegalArgumentException("Invalid URL [" + url + "]");
 		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+			throw newUncheckedIOException("Failed to request URL [" + url + "]", e);
 		}
 		if (responseText.isEmpty()) {
 			log(DEBUG, "Query profile of [" + uuid + "] at [" + apiProvider + "], not found");
@@ -109,9 +109,9 @@ public class YggdrasilClient {
 		try {
 			responseText = asString(http("GET", apiProvider.hasJoinedServer(username, serverId, ip) , proxy));
 		} catch (URISyntaxException e) {
-			throw new IllegalArgumentException("Invalid URL '" + apiProvider.hasJoinedServer(username, serverId, ip) + "'");
+			throw new IllegalArgumentException("Invalid URL [" + apiProvider.hasJoinedServer(username, serverId, ip) + "]");
 		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+			throw newUncheckedIOException("Failed to request URL [" + apiProvider.hasJoinedServer(username, serverId, ip) + "]", e);
 		}
 		if (responseText.isEmpty()) {
 			log(DEBUG, "Username [" + username + "] is not authenticated at [" + apiProvider + "] Yggdrasil server");

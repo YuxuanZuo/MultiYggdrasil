@@ -43,9 +43,9 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import xyz.zuoyx.multiyggdrasil.Config;
+import xyz.zuoyx.multiyggdrasil.util.UnsupportedURLException;
 
 public class URLProcessor {
 
@@ -62,7 +62,7 @@ public class URLProcessor {
 
 	/**
 	 * Transforms the input URL(which is grabbed from the bytecode).
-	 *
+	 * <p>
 	 * If any filter is interested in the URL, the URL will be redirected to the local HTTP server.
 	 * Otherwise, the URLRedirector will be invoked to determine whether the URL should be modified
 	 * and pointed to the customized authentication server.
@@ -128,49 +128,41 @@ public class URLProcessor {
 
 	private HttpServer createHttpServer() throws IOException {
 		HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", Config.httpdPort), 0);
-		server.createContext("/", new HttpHandler() {
-			@Override
-			public void handle(HttpExchange exchange) throws IOException {
-				if (exchange.getRequestURI().getPath().startsWith("/debug/")) {
-					debugApi.serve(exchange);
-					return;
-				}
-
-				Matcher matcher = LOCAL_URL_REGEX.matcher(exchange.getRequestURI().getPath());
-				if (matcher.find()) {
-					String protocol = matcher.group("protocol");
-					String domain = matcher.group("domain");
-					String path = matcher.group("path");
-					for (URLFilter filter : filters) {
-						if (filter.canHandle(domain)) {
-							boolean result;
-							try {
-								result = filter.handle(domain, path, exchange);
-							} catch (Throwable e) {
-								log(WARNING, "An error occurred while processing request [" + exchange.getRequestURI().getPath() + "]", e);
-								sendResponse(exchange, 500, CONTENT_TYPE_TEXT, "Internal Server Error".getBytes());
-								return;
-							}
-
-							if (result) {
-								log(DEBUG, "Request to [" + exchange.getRequestURI().getPath() + "] is handled by [" + filter + "]");
-								return;
-							}
+		server.createContext("/debug/", exchange -> debugApi.serve(exchange));
+		server.createContext("/", exchange -> {
+			Matcher matcher = LOCAL_URL_REGEX.matcher(exchange.getRequestURI().getPath());
+			if (matcher.find()) {
+				String protocol = matcher.group("protocol");
+				String domain = matcher.group("domain");
+				String path = matcher.group("path");
+				for (URLFilter filter : filters) {
+					if (filter.canHandle(domain)) {
+						try {
+							filter.handle(domain, path, exchange);
+						} catch (UnsupportedURLException e) {
+							continue;
+						} catch (Throwable e) {
+							log(WARNING, "An error occurred while processing request [" + exchange.getRequestURI().getPath() + "]", e);
+							sendResponse(exchange, 500, CONTENT_TYPE_TEXT, "Internal Server Error".getBytes());
+							return;
 						}
-					}
 
-					String target = redirector.redirect(domain, path)
-							.orElseGet(() -> protocol + "://" + domain + path);
-					try {
-						reverseProxy(exchange, target);
-					} catch (URISyntaxException | IOException e) {
-						log(WARNING, "Reverse proxy error", e);
-						sendResponse(exchange, 502, CONTENT_TYPE_TEXT, "Bad Gateway".getBytes());
+						log(DEBUG, "Request to [" + exchange.getRequestURI().getPath() + "] is handled by [" + filter + "]");
+						return;
 					}
-				} else {
-					log(DEBUG, "No handler is found for [" + exchange.getRequestURI().getPath() + "]");
-					sendResponse(exchange, 404, CONTENT_TYPE_TEXT, "Not Found".getBytes());
 				}
+
+				String target = redirector.redirect(domain, path)
+						.orElseGet(() -> protocol + "://" + domain + path);
+				try {
+					reverseProxy(exchange, target);
+				} catch (URISyntaxException | IOException e) {
+					log(WARNING, "Reverse proxy error", e);
+					sendResponse(exchange, 502, CONTENT_TYPE_TEXT, "Bad Gateway".getBytes());
+				}
+			} else {
+				log(DEBUG, "No handler is found for [" + exchange.getRequestURI().getPath() + "]");
+				sendResponse(exchange, 404, CONTENT_TYPE_TEXT, "Not Found".getBytes());
 			}
 		});
 		return server;

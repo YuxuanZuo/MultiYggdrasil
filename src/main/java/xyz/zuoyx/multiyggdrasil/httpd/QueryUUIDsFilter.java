@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import com.sun.net.httpserver.HttpExchange;
+import xyz.zuoyx.multiyggdrasil.util.UnsupportedURLException;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.YggdrasilClient;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.YggdrasilResponseBuilder;
 
@@ -50,15 +51,14 @@ public class QueryUUIDsFilter implements URLFilter {
 	}
 
 	@Override
-	public boolean handle(String domain, String path, HttpExchange exchange) throws IOException {
+	public void handle(String domain, String path, HttpExchange exchange) throws UnsupportedURLException, IOException {
 		if (domain.equals("api.mojang.com") && path.equals("/profiles/minecraft") && exchange.getRequestMethod().equals("POST")) {
 			Set<String> request = new LinkedHashSet<>();
 			parseJson(asString(asBytes(exchange.getRequestBody()))).getAsJsonArray()
 					.forEach(element -> request.add(asJsonString(element)));
 			sendResponse(exchange, 200, CONTENT_TYPE_JSON, YggdrasilResponseBuilder.queryUUIDs(performQuery(request)).getBytes());
-			return true;
 		} else {
-			return false;
+			throw new UnsupportedURLException();
 		}
 	}
 

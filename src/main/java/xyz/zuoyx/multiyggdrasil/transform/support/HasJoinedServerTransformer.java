@@ -28,10 +28,8 @@ import xyz.zuoyx.multiyggdrasil.transform.TransformContext;
 import xyz.zuoyx.multiyggdrasil.transform.TransformUnit;
 
 /**
- * Hack authlib to create game profile with username in hasJoined response.
- *
- * Generally, server will create game profile with username sent by client.
- * This transformer changed this behavior.
+ * By default, Minecraft uses the username sent by the client to create a game profile.
+ * This transformer will make Minecraft use the username from the hasJoined response to create the game profile.
  */
 public class HasJoinedServerTransformer implements TransformUnit {
 

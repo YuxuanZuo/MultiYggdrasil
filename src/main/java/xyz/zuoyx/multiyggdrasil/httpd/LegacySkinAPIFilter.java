@@ -38,6 +38,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
 import xyz.zuoyx.multiyggdrasil.util.JsonUtils;
+import xyz.zuoyx.multiyggdrasil.util.UnsupportedURLException;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.YggdrasilClient;
 
 public class LegacySkinAPIFilter implements URLFilter {
@@ -56,12 +57,12 @@ public class LegacySkinAPIFilter implements URLFilter {
 	}
 
 	@Override
-	public boolean handle(String domain, String path, HttpExchange exchange) throws IOException {
+	public void handle(String domain, String path, HttpExchange exchange) throws UnsupportedURLException, IOException {
 		if (!domain.equals("skins.minecraft.net"))
-			return false;
+			throw new UnsupportedURLException();
 		Matcher matcher = PATH_SKINS.matcher(path);
 		if (!matcher.find())
-			return false;
+			throw new UnsupportedURLException();
 		String username = matcher.group("username");
 
 		// Minecraft does not encode non-ASCII characters in URLs
@@ -85,7 +86,9 @@ public class LegacySkinAPIFilter implements URLFilter {
 			byte[] data;
 			try {
 				data = http("GET", url);
-			} catch (URISyntaxException | IOException e) {
+			} catch (URISyntaxException e) {
+				throw new IllegalArgumentException("Invalid URL [" + url + "]");
+			} catch (IOException e) {
 				throw newUncheckedIOException("Failed to retrieve skin from " + url, e);
 			}
 			log(INFO, "Retrieved skin for " + username + " from " + url + ", " + data.length + " bytes");
@@ -95,7 +98,6 @@ public class LegacySkinAPIFilter implements URLFilter {
 			log(INFO, "No skin is found for " + username);
 			sendResponse(exchange, 404, null, null);
 		}
-		return true;
 	}
 
 	private Optional<String> obtainTextureUrl(String texturesPayload, String textureType) throws UncheckedIOException {

@@ -28,6 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.sun.net.httpserver.HttpExchange;
+import xyz.zuoyx.multiyggdrasil.util.UnsupportedURLException;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.GameProfile;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.YggdrasilClient;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.YggdrasilResponseBuilder;
@@ -50,19 +51,19 @@ public class QueryProfileFilter implements URLFilter {
 	}
 
 	@Override
-	public boolean handle(String domain, String path, HttpExchange exchange) throws IOException {
+	public void handle(String domain, String path, HttpExchange exchange) throws UnsupportedURLException, IOException {
 		if (!domain.equals("sessionserver.mojang.com"))
-			return false;
+			throw new UnsupportedURLException();
 		Matcher matcher = PATH_REGEX.matcher(path);
 		if (!matcher.find())
-			return false;
+			throw new UnsupportedURLException();
 
 		UUID uuid;
 		try {
 			uuid = fromUnsignedUUID(matcher.group("uuid"));
 		} catch (IllegalArgumentException e) {
 			sendResponse(exchange, 204, null, null);
-			return true;
+			return;
 		}
 
 		boolean withSignature = false;
@@ -87,7 +88,6 @@ public class QueryProfileFilter implements URLFilter {
 		} else {
 			sendResponse(exchange, 204, null, null);
 		}
-		return true;
 	}
 
 }
