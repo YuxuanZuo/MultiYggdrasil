@@ -3,7 +3,7 @@
 
 # MultiYggdrasil
 [![latest release](https://img.shields.io/github/v/tag/YuxuanZuo/MultiYggdrasil?color=yellow&include_prereleases&label=version&sort=semver&style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/releases)
-[![ci status](https://img.shields.io/github/workflow/status/YuxuanZuo/MultiYggdrasil/CI?style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/actions?query=workflow%3ACI)
+[![ci status](https://img.shields.io/github/actions/workflow/status/YuxuanZuo/MultiYggdrasil/ci.yml?branch=develop)](https://github.com/YuxuanZuo/MultiYggdrasil/actions?query=workflow%3ACI)
 [![license agpl-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg?style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/blob/develop/LICENSE)
 
 A fork of authlib-injector with support for coexist with the Mojang authentication server.
@@ -27,6 +27,9 @@ Configure Minecraft server with the following JVM parameter:
 ```
 -javaagent:{/path/to/MultiYggdrasil.jar}={Authentication Server URL}
 ```
+Note: Unless the custom authentication server supports Mojang authentication server coexistence, this feature will not 
+be enabled by default. You need to enable it by adding specific JVM parameters. Please refer to the [Options](README.en.md#options) 
+section for more details.
 
 ## Options
 ```
@@ -74,6 +77,7 @@ Configure Minecraft server with the following JVM parameter:
 -Dauthlibinjector.disableHttpd
     Disable local HTTP server.
     Features (see below) depending on local HTTP server will be unavailable:
+     - Mojang Yggdrasil server
      - Mojang namespace
      - Legacy skin API polyfill
 
@@ -121,9 +125,9 @@ Configure Minecraft server with the following JVM parameter:
     In order to distinguish the username of players from the custom authentication server from that of the Mojang server,
     the player who from the custom authentication server will add a namespace suffix to their username.
     For example:
-      Notch.custom
+      Notch.cust
     If the option "-Dmultiyggdrasil.namespace" is not set and the field "namespace" is not sent by authentication
-    server, the server will issue a default namespace called "custom". If any fields were sent, the server will use the
+    server, the server will issue a default namespace called "cust". If any fields were sent, the server will use the
     namespace that you defined earlier.
     
     Some features that conflict with Mojang Yggdrasil server will no longer available anymore:
@@ -134,7 +138,7 @@ Configure Minecraft server with the following JVM parameter:
     (The default is to give priority to verification of the genuine player).
 
 -Dmultiyggdrasil.namespace={namespace string}
-    Set the namespace used by the feature "Mojang authentication server". Allowed characters are a-z0-9._- .
+    Set the namespace used by the feature "Mojang authentication server". Allowed characters are a-z0-9_- .
 
 -Dmultiyggdrasil.noNamespaceSuffix
     Do not add namespace suffix to the username.
@@ -158,4 +162,3 @@ This work is licensed under the [GNU Affero General Public License v3.0](https:/
 This is the base of this project, which makes our ideas possible.
 * [Gson](https://github.com/google/gson) by Google Inc.
 * [ASM](https://asm.ow2.io) by INRIA, France Telecom
-* [NanoHttpd](https://github.com/NanoHttpd/nanohttpd)

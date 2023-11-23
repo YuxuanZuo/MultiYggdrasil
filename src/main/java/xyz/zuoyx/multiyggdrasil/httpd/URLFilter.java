@@ -17,10 +17,9 @@
 package xyz.zuoyx.multiyggdrasil.httpd;
 
 import java.io.IOException;
-import java.util.Optional;
 
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.IHTTPSession;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Response;
+import com.sun.net.httpserver.HttpExchange;
+import xyz.zuoyx.multiyggdrasil.util.UnsupportedURLException;
 
 /**
  * A URLFilter filters the URLs in the bytecode, and intercepts those it is interested in.
@@ -29,13 +28,13 @@ public interface URLFilter {
 
 	/**
 	 * Returns true if the filter MAY be interested in the given domain.
-	 *
+	 * <p>
 	 * If this method returns true, the domain will be intercepted.
 	 * And when a request is sent to this domain, handle() will be invoked.
-	 * If it turns out that the filter doesn't really want to intercept the URL (handle() returns empty),
+	 * If it turns out that the filter doesn't really want to intercept the URL (handle() throws UnsupportedURLException),
 	 * the request will be reverse-proxied to the original URL, as if nothing has happened.
 	 */
 	boolean canHandle(String domain);
 
-	Optional<Response> handle(String domain, String path, IHTTPSession session) throws IOException;
+	void handle(String domain, String path, HttpExchange exchange) throws UnsupportedURLException, IOException;
 }

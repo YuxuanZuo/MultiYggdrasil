@@ -26,7 +26,7 @@ import xyz.zuoyx.multiyggdrasil.transform.TransformUnit;
 
 /**
  * Hacks BungeeCord to allow special characters to occur in the username.
- *
+ * <p>
  * Since <a href="https://github.com/SpigotMC/BungeeCord/commit/3008d7ef2f50de7e3d38e76717df72dac7fe0da3">...</a>,
  * BungeeCord allows only certain characters to occur in the username when online-mode is on.
  */

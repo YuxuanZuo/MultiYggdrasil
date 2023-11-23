@@ -36,6 +36,8 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.instrument.Instrumentation;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -143,7 +145,7 @@ public final class MultiYggdrasil {
 		} else {
 
 			try {
-				HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
+				HttpURLConnection connection = (HttpURLConnection) new URI(apiUrl).toURL().openConnection();
 
 				String ali = connection.getHeaderField("x-authlib-injector-api-location");
 				if (ali != null) {
@@ -156,7 +158,7 @@ public final class MultiYggdrasil {
 						try (InputStream in = connection.getInputStream()) {
 							while (in.read() != -1)
 								;
-						} catch (IOException e) {
+						} catch (IOException ignored) {
 						}
 
 						log(INFO, "Redirect to: " + absoluteAli);
@@ -169,7 +171,7 @@ public final class MultiYggdrasil {
 				try (InputStream in = connection.getInputStream()) {
 					metadataResponse = asString(asBytes(in));
 				}
-			} catch (IOException e) {
+			} catch (URISyntaxException | IOException e) {
 				log(ERROR, "Failed to fetch metadata: " + e);
 				throw new InitializationException(e);
 			}
@@ -211,8 +213,8 @@ public final class MultiYggdrasil {
 	}
 
 	private static String addHttpsIfMissing(String url) {
-		String lowercased = url.toLowerCase();
-		if (!lowercased.startsWith("http://") && !lowercased.startsWith("https://")) {
+		String lowerCase = url.toLowerCase();
+		if (!lowerCase.startsWith("http://") && !lowerCase.startsWith("https://")) {
 			url = "https://" + url;
 		}
 		return url;

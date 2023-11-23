@@ -35,7 +35,7 @@ import xyz.zuoyx.multiyggdrasil.transform.TransformUnit;
 
 /**
  * Support for Citizens2
- *
+ * <p>
  * In <a href="https://github.com/CitizensDev/Citizens2/commit/28b0c4fdc3b343d4dc14f2a45cff37c0b75ced1d">...</a>,
  * the profile-url that Citizens use became configurable. This class is used to make Citizens ignore
  * the config property and use MultiYggdrasil's url.

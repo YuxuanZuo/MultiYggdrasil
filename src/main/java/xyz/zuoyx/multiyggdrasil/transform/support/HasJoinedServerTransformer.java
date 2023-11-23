@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022  Ethan Zuo <yuxuan.zuo@outlook.com>
+ * Copyright (C) 2023  Ethan Zuo <yuxuan.zuo@outlook.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,10 +28,8 @@ import xyz.zuoyx.multiyggdrasil.transform.TransformContext;
 import xyz.zuoyx.multiyggdrasil.transform.TransformUnit;
 
 /**
- * Hack authlib to create game profile with username in hasJoined response.
- *
- * Generally, server will create game profile with username sent by client.
- * This transformer changed this behavior.
+ * By default, Minecraft uses the username sent by the client to create a game profile.
+ * This transformer will make Minecraft use the username from the hasJoined response to create the game profile.
  */
 public class HasJoinedServerTransformer implements TransformUnit {
 
@@ -42,14 +40,13 @@ public class HasJoinedServerTransformer implements TransformUnit {
 				@Override
 				public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
 					if ("hasJoinedServer".equals(name) &&
-							"(Lcom/mojang/authlib/GameProfile;Ljava/lang/String;Ljava/net/InetAddress;)Lcom/mojang/authlib/GameProfile;".equals(descriptor)) {
+							"(Ljava/lang/String;Ljava/lang/String;Ljava/net/InetAddress;)Lcom/mojang/authlib/yggdrasil/ProfileResult;".equals(descriptor)) {
 						return new MethodVisitor(ASM9, super.visitMethod(access, name, descriptor, signature, exceptions)) {
 
 							// States:
 							// 0 - initial state
-							// 1 - invokevirtual com/mojang/authlib/yggdrasil/response/HasJoinedMinecraftServerResponse.getId:()Ljava/util/UUID;
+							// 1 - invokevirtual com/mojang/authlib/yggdrasil/response/HasJoinedMinecraftServerResponse.id:()Ljava/util/UUID;
 							// 2 - aload_1
-							// 3 - invokevirtual com/mojang/authlib/GameProfile.getName:()Ljava/lang/String;
 							int state = 0;
 
 							@Override
@@ -57,21 +54,11 @@ public class HasJoinedServerTransformer implements TransformUnit {
 								if (state == 0 &&
 										opcode == INVOKEVIRTUAL &&
 										"com/mojang/authlib/yggdrasil/response/HasJoinedMinecraftServerResponse".equals(owner) &&
-										"getId".equals(name) &&
+										"id".equals(name) &&
 										"()Ljava/util/UUID;".equals(descriptor)) {
 									state++;
-									super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
-								} else if (state == 2 &&
-										opcode == INVOKEVIRTUAL &&
-										"com/mojang/authlib/GameProfile".equals(owner) &&
-										"getName".equals(name) &&
-										"()Ljava/lang/String;".equals(descriptor)) {
-									state++;
-									context.markModified();
-									super.visitMethodInsn(opcode, "com/mojang/authlib/yggdrasil/response/HasJoinedMinecraftServerResponse", name, descriptor, isInterface);
-								} else {
-									super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
 								}
+								super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
 							}
 
 							@Override
@@ -80,6 +67,11 @@ public class HasJoinedServerTransformer implements TransformUnit {
 									state++;
 									context.markModified();
 									super.visitVarInsn(opcode, 6);
+									super.visitMethodInsn(INVOKEVIRTUAL,
+											"com/mojang/authlib/yggdrasil/response/HasJoinedMinecraftServerResponse",
+											"name",
+											"()Ljava/lang/String;",
+											false);
 								} else {
 									super.visitVarInsn(opcode, var);
 								}

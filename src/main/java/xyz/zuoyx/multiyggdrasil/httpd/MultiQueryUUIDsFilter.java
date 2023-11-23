@@ -19,18 +19,17 @@ package xyz.zuoyx.multiyggdrasil.httpd;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.CONTENT_TYPE_JSON;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.asBytes;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.asString;
+import static xyz.zuoyx.multiyggdrasil.util.IOUtils.sendResponse;
 import static xyz.zuoyx.multiyggdrasil.util.JsonUtils.asJsonString;
 import static xyz.zuoyx.multiyggdrasil.util.JsonUtils.parseJson;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.IHTTPSession;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Response;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Status;
+import com.sun.net.httpserver.HttpExchange;
+import xyz.zuoyx.multiyggdrasil.util.UnsupportedURLException;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.NamespacedID;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.YggdrasilClient;
 import xyz.zuoyx.multiyggdrasil.yggdrasil.YggdrasilResponseBuilder;
@@ -53,15 +52,14 @@ public class MultiQueryUUIDsFilter implements URLFilter {
 	}
 
 	@Override
-	public Optional<Response> handle(String domain, String path, IHTTPSession session) throws IOException {
-		if (domain.equals("api.mojang.com") && path.equals("/profiles/minecraft") && session.getMethod().equals("POST")) {
+	public void handle(String domain, String path, HttpExchange exchange) throws UnsupportedURLException, IOException {
+		if (domain.equals("api.mojang.com") && path.equals("/profiles/minecraft") && exchange.getRequestMethod().equals("POST")) {
 			Set<String> request = new LinkedHashSet<>();
-			parseJson(asString(asBytes(session.getInputStream()))).getAsJsonArray()
+			parseJson(asString(asBytes(exchange.getRequestBody()))).getAsJsonArray()
 					.forEach(element -> request.add(asJsonString(element)));
-			return Optional.of(Response.newFixedLength(Status.OK, CONTENT_TYPE_JSON,
-					YggdrasilResponseBuilder.queryUUIDs(performQuery(request))));
+			sendResponse(exchange, 200, CONTENT_TYPE_JSON, YggdrasilResponseBuilder.queryUUIDs(performQuery(request)).getBytes());
 		} else {
-			return Optional.empty();
+			throw new UnsupportedURLException();
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022  Haowei Wen <yushijinhun@gmail.com> and contributors
+ * Copyright (C) 2023  Haowei Wen <yushijinhun@gmail.com> and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -16,16 +16,17 @@
  */
 package xyz.zuoyx.multiyggdrasil.transform.support;
 
+import static java.lang.invoke.MethodHandles.publicLookup;
+import static java.lang.invoke.MethodType.methodType;
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.asBytes;
 import static xyz.zuoyx.multiyggdrasil.util.Logging.Level.DEBUG;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.ARETURN;
 import static org.objectweb.asm.Opcodes.ASM9;
-import static org.objectweb.asm.Opcodes.GETFIELD;
-import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.IRETURN;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandle;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.PrivateKey;
@@ -61,7 +62,32 @@ public class YggdrasilKeyTransformUnit implements TransformUnit {
 	}
 
 	@CallbackMethod
-	public static boolean verifyPropertySignature(String propertyValue, String base64Signature) {
+	public static boolean verifyPropertySignature(Object propertyObj) {
+		String base64Signature;
+		String propertyValue;
+
+		try {
+			MethodHandle valueHandle;
+			try {
+				valueHandle = publicLookup().findVirtual(propertyObj.getClass(), "getValue", methodType(String.class));
+			} catch (NoSuchMethodException ignored) {
+				valueHandle = publicLookup().findVirtual(propertyObj.getClass(), "value", methodType(String.class));
+			}
+
+			MethodHandle signatureHandle;
+			try {
+				signatureHandle = publicLookup().findVirtual(propertyObj.getClass(), "getSignature", methodType(String.class));
+			} catch(NoSuchMethodException ignored) {
+				signatureHandle = publicLookup().findVirtual(propertyObj.getClass(), "signature", methodType(String.class));
+			}
+
+			base64Signature = (String) signatureHandle.invokeWithArguments(propertyObj);
+			propertyValue = (String) valueHandle.invokeWithArguments(propertyObj);
+		} catch (Throwable e) {
+			Logging.log(Level.ERROR, "Failed to get property attributes", e);
+			return false;
+		}
+
 		byte[] sig = Base64.getDecoder().decode(base64Signature);
 		byte[] data = propertyValue.getBytes();
 
@@ -105,6 +131,7 @@ public class YggdrasilKeyTransformUnit implements TransformUnit {
 			}
 
 			@Override
+			@Deprecated
 			protected void engineSetParameter(String param, Object value) {
 
 			}
@@ -119,6 +146,7 @@ public class YggdrasilKeyTransformUnit implements TransformUnit {
 			}
 
 			@Override
+			@Deprecated
 			protected Object engineGetParameter(String param) {
 				return null;
 			}
@@ -143,9 +171,6 @@ public class YggdrasilKeyTransformUnit implements TransformUnit {
 						MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
 						mv.visitCode();
 						mv.visitVarInsn(ALOAD, 0);
-						mv.visitFieldInsn(GETFIELD, "com/mojang/authlib/properties/Property", "value", "Ljava/lang/String;");
-						mv.visitVarInsn(ALOAD, 0);
-						mv.visitFieldInsn(GETFIELD, "com/mojang/authlib/properties/Property", "signature", "Ljava/lang/String;");
 						ctx.invokeCallback(mv, YggdrasilKeyTransformUnit.class, "verifyPropertySignature");
 						mv.visitInsn(IRETURN);
 						mv.visitMaxs(-1, -1);
@@ -168,9 +193,6 @@ public class YggdrasilKeyTransformUnit implements TransformUnit {
 						MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
 						mv.visitCode();
 						mv.visitVarInsn(ALOAD, 1);
-						mv.visitMethodInsn(INVOKEVIRTUAL, "com/mojang/authlib/properties/Property", "getValue", "()Ljava/lang/String;", false);
-						mv.visitVarInsn(ALOAD, 1);
-						mv.visitMethodInsn(INVOKEVIRTUAL, "com/mojang/authlib/properties/Property", "getSignature", "()Ljava/lang/String;", false);
 						ctx.invokeCallback(mv, YggdrasilKeyTransformUnit.class, "verifyPropertySignature");
 						mv.visitInsn(IRETURN);
 						mv.visitMaxs(-1, -1);

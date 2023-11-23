@@ -17,18 +17,17 @@
 package xyz.zuoyx.multiyggdrasil.httpd;
 
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.CONTENT_TYPE_JSON;
+import static xyz.zuoyx.multiyggdrasil.util.IOUtils.sendResponse;
 import static xyz.zuoyx.multiyggdrasil.util.JsonUtils.toJsonString;
 
 import java.io.IOException;
 import java.security.PublicKey;
 import java.util.Base64;
-import java.util.Optional;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.IHTTPSession;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Response;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Status;
+import com.sun.net.httpserver.HttpExchange;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import xyz.zuoyx.multiyggdrasil.transform.support.YggdrasilKeyTransformUnit;
+import xyz.zuoyx.multiyggdrasil.util.UnsupportedURLException;
 
 public class PublickeysFilter implements URLFilter {
 
@@ -38,11 +37,12 @@ public class PublickeysFilter implements URLFilter {
 	}
 
 	@Override
-	public Optional<Response> handle(String domain, String path, IHTTPSession session) throws IOException {
-		if (domain.equals("api.minecraftservices.com") && path.equals("/publickeys") && session.getMethod().equals("GET")) {
-			return Optional.of(Response.newFixedLength(Status.OK, CONTENT_TYPE_JSON, toJsonString(makePublickeysResponse())));
+	public void handle(String domain, String path, HttpExchange exchange) throws UnsupportedURLException, IOException {
+		if (domain.equals("api.minecraftservices.com") && path.equals("/publickeys") && exchange.getRequestMethod().equals("GET")) {
+			sendResponse(exchange, 200, CONTENT_TYPE_JSON, toJsonString(makePublickeysResponse()).getBytes());
+		} else {
+			throw new UnsupportedURLException();
 		}
-		return Optional.empty();
 	}
 
 	private JsonObject makePublickeysResponse() {

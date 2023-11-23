@@ -3,7 +3,7 @@
 
 # MultiYggdrasil
 [![latest release](https://img.shields.io/github/v/tag/YuxuanZuo/MultiYggdrasil?color=yellow&include_prereleases&label=version&sort=semver&style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/releases)
-[![ci status](https://img.shields.io/github/workflow/status/YuxuanZuo/MultiYggdrasil/CI?style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/actions?query=workflow%3ACI)
+[![ci status](https://img.shields.io/github/actions/workflow/status/YuxuanZuo/MultiYggdrasil/ci.yml?branch=develop)](https://github.com/YuxuanZuo/MultiYggdrasil/actions?query=workflow%3ACI)
 [![license agpl-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg?style=flat-square)](https://github.com/YuxuanZuo/MultiYggdrasil/blob/develop/LICENSE)
 
 一个 [authlib-injector](https://github.com/yushijinhun/authlib-injector) 的分支, 添加了与 Mojang 验证服务器共存的支持.
@@ -27,6 +27,8 @@ gradle
 ```
 -javaagent:{MultiYggdrasil.jar 的路径}={验证服务器 URL (API 地址)}
 ```
+注意: 除非验证服务器支持, 否则默认情况下不会启用 Mojang 验证服务器共存功能, 您需要通过添加特定 JVM 参数来启用这项功能. 
+详情请参阅[参数](README.md#参数)小节.
 
 ## 参数
 ```
@@ -82,6 +84,7 @@ gradle
 -Dauthlibinjector.disableHttpd
     禁用内建的 HTTP 服务器.
     以下依赖内建 HTTP 服务器的功能将不可用:
+     - Mojang 验证服务器
      - Mojang 命名空间
      - 旧式皮肤 API polyfill
 
@@ -124,8 +127,8 @@ gradle
 
     为了将自定义验证服务器角色与正版角色的用户名区别开, 前者的用户名将被添加命名空间后缀.
     例如:
-      Notch.custom
-    若未设置 -Dmultiyggdrasil.namespace 参数且验证服务器未设置 namespace 字段, 将使用默认命名空间 custom, 否则使用定义的命名空间.
+      Notch.cust
+    若未设置 -Dmultiyggdrasil.namespace 参数且验证服务器未设置 namespace 字段, 将使用默认命名空间 cust, 否则使用定义的命名空间.
 
     以下与 Mojang 验证服务器冲突的功能将不可用:
      - Mojang 命名空间
@@ -134,7 +137,7 @@ gradle
     在登录游戏服务器时优先验证来自自定义验证服务器的角色（默认为优先验证正版角色）.
 
 -Dmultiyggdrasil.namespace={命名空间字符串}
-    设置 Mojang 验证服务器 功能使用的命名空间, 允许的字符为 a-z0-9._- .
+    设置 Mojang 验证服务器 功能使用的命名空间, 允许的字符为 a-z0-9_- .
 
 -Dmultiyggdrasil.noNamespaceSuffix
     不要在用户名中添加命名空间后缀.
@@ -156,4 +159,3 @@ gradle
 这是本项目的基础, 它使得我们的想法成为可能.
  * [Gson](https://github.com/google/gson) by Google Inc.
  * [ASM](https://asm.ow2.io) by INRIA, France Telecom
- * [NanoHttpd](https://github.com/NanoHttpd/nanohttpd)

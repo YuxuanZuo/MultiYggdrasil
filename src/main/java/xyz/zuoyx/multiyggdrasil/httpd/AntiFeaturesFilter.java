@@ -17,11 +17,10 @@
 package xyz.zuoyx.multiyggdrasil.httpd;
 
 import static xyz.zuoyx.multiyggdrasil.util.IOUtils.CONTENT_TYPE_JSON;
-import static xyz.zuoyx.multiyggdrasil.util.IOUtils.CONTENT_TYPE_TEXT;
-import java.util.Optional;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.IHTTPSession;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Response;
-import xyz.zuoyx.multiyggdrasil.internal.fi.iki.elonen.Status;
+import static xyz.zuoyx.multiyggdrasil.util.IOUtils.sendResponse;
+import java.io.IOException;
+import com.sun.net.httpserver.HttpExchange;
+import xyz.zuoyx.multiyggdrasil.util.UnsupportedURLException;
 
 /**
  * Disables Mojang's anti-features.
@@ -38,17 +37,17 @@ public class AntiFeaturesFilter implements URLFilter {
 	}
 
 	@Override
-	public Optional<Response> handle(String domain, String path, IHTTPSession session) {
-		if (domain.equals("api.minecraftservices.com") && path.equals("/privileges") && session.getMethod().equals("GET")) {
-			return Optional.of(Response.newFixedLength(Status.OK, CONTENT_TYPE_JSON, RESPONSE_PRIVILEGES));
-		} else if (domain.equals("api.minecraftservices.com") && path.equals("/player/attributes") && session.getMethod().equals("GET")) {
-			return Optional.of(Response.newFixedLength(Status.OK, CONTENT_TYPE_JSON, RESPONSE_PLAYER_ATTRIBUTES));
-		} else if (domain.equals("api.minecraftservices.com") && path.equals("/privacy/blocklist") && session.getMethod().equals("GET")) {
-			return Optional.of(Response.newFixedLength(Status.OK, CONTENT_TYPE_JSON, RESPONSE_PRIVACY_BLOCKLIST));
-		} else if (domain.equals("sessionserver.mojang.com") && path.equals("/blockedservers") && session.getMethod().equals("GET")) {
-			return Optional.of(Response.newFixedLength(Status.NOT_FOUND, CONTENT_TYPE_TEXT, ""));
+	public void handle(String domain, String path, HttpExchange exchange) throws UnsupportedURLException, IOException {
+		if (domain.equals("api.minecraftservices.com") && path.equals("/privileges") && exchange.getRequestMethod().equals("GET")) {
+			sendResponse(exchange, 200, CONTENT_TYPE_JSON, RESPONSE_PRIVILEGES.getBytes());
+		} else if (domain.equals("api.minecraftservices.com") && path.equals("/player/attributes") && exchange.getRequestMethod().equals("GET")) {
+			sendResponse(exchange, 200, CONTENT_TYPE_JSON, RESPONSE_PLAYER_ATTRIBUTES.getBytes());
+		} else if (domain.equals("api.minecraftservices.com") && path.equals("/privacy/blocklist") && exchange.getRequestMethod().equals("GET")) {
+			sendResponse(exchange, 200, CONTENT_TYPE_JSON, RESPONSE_PRIVACY_BLOCKLIST.getBytes());
+		} else if (domain.equals("sessionserver.mojang.com") && path.equals("/blockedservers") && exchange.getRequestMethod().equals("GET")) {
+			sendResponse(exchange, 404, null, null);
 		} else {
-			return Optional.empty();
+			throw new UnsupportedURLException();
 		}
 	}
 }
