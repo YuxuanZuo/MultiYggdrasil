@@ -16,25 +16,22 @@
  */
 package xyz.zuoyx.multiyggdrasil.util;
 
-import java.io.Serial;
-
 public class UnsupportedURLException extends Exception {
-    @Serial
     private static final long serialVersionUID = 7895188952767140345L;
 
     public UnsupportedURLException() {
-        this(null, null);
+        super();
     }
 
     public UnsupportedURLException(String message) {
-        this(message, null);
+        super(message);
     }
 
     public UnsupportedURLException(String message, Throwable cause) {
-        super(message, cause, false, false);
+        super(message, cause);
     }
 
     public UnsupportedURLException(Throwable cause) {
-        this(null, cause);
+        super(cause);
     }
 }

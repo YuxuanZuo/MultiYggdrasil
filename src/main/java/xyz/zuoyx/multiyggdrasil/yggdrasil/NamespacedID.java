@@ -93,7 +93,8 @@ public class NamespacedID {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof NamespacedID other) {
+        if (obj instanceof NamespacedID) {
+            NamespacedID other = (NamespacedID) obj;
             return this.namespace.equals(other.namespace) && this.id.equals(other.id);
         }
         return false;
