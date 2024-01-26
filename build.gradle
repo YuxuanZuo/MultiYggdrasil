@@ -60,7 +60,7 @@ shadowJar {
   exclude 'module-info.class'
   exclude '**/module-info.class'
 
-  relocate 'com.google.code', 'xyz.zuoyx.multiyggdrasil.internal.com.google.code'
+  relocate 'com.google.gson', 'xyz.zuoyx.multiyggdrasil.internal.com.google.gson'
   relocate 'org.objectweb.asm', 'xyz.zuoyx.multiyggdrasil.internal.org.objectweb.asm'
 }
 
