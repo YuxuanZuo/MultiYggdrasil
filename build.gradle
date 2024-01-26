@@ -9,9 +9,8 @@ repositories {
 }
 
 dependencies {
-	implementation 'com.google.code.gson:gson:2.10.1'
+  implementation 'com.google.code.gson:gson:2.10.1'
 	implementation 'org.ow2.asm:asm:9.6'
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
 }
 
 test {
@@ -19,7 +18,8 @@ test {
 }
 
 compileJava {
-	options.release = 17
+  options.release = 8
+  options.deprecation = true
 }
 
 def buildNumber = System.getenv('AI_BUILD_NUMBER')
@@ -54,9 +54,14 @@ processResources {
 }
 
 shadowJar {
-	exclude 'META-INF/maven/**'
-	exclude 'module-info.class'
-	exclude '**/module-info.class'
+  archiveClassifier.set(null)
+
+  exclude 'META-INF/maven/**'
+  exclude 'module-info.class'
+  exclude '**/module-info.class'
+
+  relocate 'com.google.code', 'xyz.zuoyx.multiyggdrasil.internal.com.google.code'
+  relocate 'org.objectweb.asm', 'xyz.zuoyx.multiyggdrasil.internal.org.objectweb.asm'
 }
 
 defaultTasks 'clean', 'shadowJar'

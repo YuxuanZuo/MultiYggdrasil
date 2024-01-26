@@ -143,7 +143,7 @@ public class ClassTransformer implements ClassFileTransformer {
 			for (int i = units.length - 1; i >= 0; i--) {
 				TransformContextImpl ctx = new TransformContextImpl();
 				Optional<ClassVisitor> visitor = units[i].transform(classLoader, className, chain, ctx);
-				if (visitor.isEmpty())
+				if (!visitor.isPresent())
 					continue;
 				ctxs[i] = ctx;
 				chain = visitor.get();
@@ -287,7 +287,7 @@ public class ClassTransformer implements ClassFileTransformer {
 				handle.accept(unitsArray);
 
 				Optional<byte[]> transformResult = handle.finish();
-				if (Config.printUntransformedClass && transformResult.isEmpty()) {
+				if (Config.printUntransformedClass && !transformResult.isPresent()) {
 					log(DEBUG, "No transformation is applied to [" + className + "]");
 				}
 

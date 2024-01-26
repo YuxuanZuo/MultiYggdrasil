@@ -74,14 +74,14 @@ public final class Config {
 		} else {
 			for (String option : prop.split(",")) {
 				switch (option) {
-					case "verbose" -> verboseLogging = true;
-					case "authlib" -> authlibLogging = true;
-					case "printUntransformed" -> {
+					case "verbose": verboseLogging = true;
+					case "authlib": authlibLogging = true;
+					case "printUntransformed": {
 						printUntransformedClass = true;
 						verboseLogging = true;
 					}
-					case "dumpClass" -> dumpClass = true;
-					default -> {
+					case "dumpClass": dumpClass = true;
+					default: {
 						log(ERROR, "Unrecognized debug option: " + option);
 						throw new InitializationException();
 					}
@@ -131,13 +131,12 @@ public final class Config {
 		int port = Integer.parseInt(matcher.group("port"));
 
 		switch (protocol) {
-			case "socks" -> mojangProxy = new Proxy(Type.SOCKS, new InetSocketAddress(host, port));
-			default -> {
+			case "socks": mojangProxy = new Proxy(Type.SOCKS, new InetSocketAddress(host, port));
+			default: {
 				log(ERROR, "Unsupported proxy protocol: " + protocol);
 				throw new InitializationException();
 			}
 		}
-		log(INFO, "Mojang proxy: " + mojangProxy);
 	}
 
 	private static FeatureOption parseFeatureOption(String property) {

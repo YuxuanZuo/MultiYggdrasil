@@ -61,7 +61,7 @@ public class MultiQueryProfileFilter implements URLFilter {
 		if (!matcher.find())
 			throw new UnsupportedURLException();
 
-		UUID uuid;
+    		UUID uuid;
 		try {
 			uuid = fromUnsignedUUID(matcher.group("uuid"));
 		} catch (IllegalArgumentException e) {
@@ -78,9 +78,9 @@ public class MultiQueryProfileFilter implements URLFilter {
 		Optional<GameProfile> response;
 		if (uuid.version() == 4) {
 			response = mojangClient.queryProfile(uuid, withSignature);
-		} else {
+      		} else {
 			response = customClient.queryProfile(uuid, withSignature);
-			response.ifPresent(profile -> profile.name = new NamespacedID(profile.name, namespace).toString());
+      			response.ifPresent(profile -> profile.name = new NamespacedID(profile.name, namespace).toString());
 		}
 
 		if (response.isPresent()) {

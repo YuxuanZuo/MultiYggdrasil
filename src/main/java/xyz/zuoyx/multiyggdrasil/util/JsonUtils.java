@@ -28,37 +28,37 @@ import com.google.gson.reflect.TypeToken;
 
 public final class JsonUtils {
 
-	private static final Gson gson = new Gson();
+    private static final Gson gson = new Gson();
 
-	public static JsonElement parseJson(String jsonText) {
-		return JsonParser.parseString(jsonText);
-	}
+    public static JsonElement parseJson(String jsonText) {
+        return JsonParser.parseString(jsonText);
+    }
 
-	public static String toJsonString(Object json) {
-		return gson.toJson(json);
-	}
+    public static String toJsonString(Object json) {
+        return gson.toJson(json);
+    }
 
-	public static String asJsonString(JsonElement json) {
-		return json.getAsJsonPrimitive().getAsString();
-	}
-	public static boolean asBoolean(JsonElement json) {
-		if (json != null) {
-			return json.getAsJsonPrimitive().getAsBoolean();
-		} else {
-			return false;
-		}
-	}
+    public static String asJsonString(JsonElement json) {
+        return json.getAsJsonPrimitive().getAsString();
+    }
+    public static boolean asBoolean(JsonElement json) {
+        if (json != null) {
+            return json.getAsJsonPrimitive().getAsBoolean();
+        } else {
+            return false;
+        }
+    }
 
-	public static List<JsonElement> toJavaList(JsonArray json) {
-		Type listType = new TypeToken<List<JsonElement>>(){}.getType();
-		return gson.fromJson(json, listType);
-	}
+    public static List<JsonElement> toJavaList(JsonArray json) {
+        Type listType = new TypeToken<List<JsonElement>>(){}.getType();
+        return gson.fromJson(json, listType);
+    }
 
-	public static Map<String, JsonElement> toJavaMap(JsonObject json) {
-		Type mapType = new TypeToken<Map<String, JsonElement>>(){}.getType();
-		return gson.fromJson(json, mapType);
-	}
+    public static Map<String, JsonElement> toJavaMap(JsonObject json) {
+        Type mapType = new TypeToken<Map<String, JsonElement>>(){}.getType();
+        return gson.fromJson(json, mapType);
+    }
 
-	private JsonUtils() {}
+    private JsonUtils() {}
 
 }
