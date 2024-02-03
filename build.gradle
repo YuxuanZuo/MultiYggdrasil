@@ -57,6 +57,9 @@ shadowJar {
 	exclude 'META-INF/maven/**'
 	exclude 'module-info.class'
 	exclude '**/module-info.class'
+
+	relocate 'com.google.gson', 'xyz.zuoyx.multiyggdrasil.internal.com.google.gson'
+	relocate 'org.objectweb.asm', 'xyz.zuoyx.multiyggdrasil.internal.org.objectweb.asm'
 }
 
 defaultTasks 'clean', 'shadowJar'
